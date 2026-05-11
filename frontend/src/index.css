@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/* Enable class-based dark mode for Tailwind v4 */
+@variant dark (&:where(.dark, .dark *));
+
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f3f4f6;
+}
+
+/* Canvas dot-grid adapts to dark mode via CSS custom properties */
+:root {
+  --canvas-bg:   #f1f5f9;
+  --dot-color:   #cbd5e1;
+}
+.dark {
+  --canvas-bg:   #1a1f2e;
+  --dot-color:   #2d3748;
+}
+
+
+/* ── Canvas Utility ────────────────────────────────────────── */
+.dot-grid {
+  background-image: radial-gradient(var(--dot-color) 1px, transparent 0);
+  background-size: 24px 24px;
+}
