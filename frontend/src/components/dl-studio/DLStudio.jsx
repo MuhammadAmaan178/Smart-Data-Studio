@@ -12,11 +12,11 @@ import InferencePanel from '../shared/InferencePanel';
 
 // ─── Shared dark-aware primitives ────────────────────────────────
 const SectionTitle = ({ children }) => (
-  <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">{children}</p>
+  <p className="text-sm font-black uppercase tracking-wider text-black mb-2">{children}</p>
 );
 
 const FormLabel = ({ children }) => (
-  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{children}</label>
+  <label className="block text-xs font-black text-black mb-1 uppercase">{children}</label>
 );
 
 const NumberInput = ({ label, value, onChange, min = 1, max }) => (
@@ -28,16 +28,14 @@ const NumberInput = ({ label, value, onChange, min = 1, max }) => (
       onChange={onChange}
       min={min}
       max={max}
-      className="w-full text-sm border border-gray-200 dark:border-gray-600 rounded-lg p-2
-                 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100
-                 focus:outline-none focus:ring-2 focus:ring-purple-500"
+      className="neo-input p-2 w-full"
     />
   </div>
 );
 
 // ─── Result card shell ────────────────────────────────────────────
 const ResultCard = ({ children, className = '' }) => (
-  <div className={`bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm ${className}`}>
+  <div className={`neo-card ${className}`}>
     {children}
   </div>
 );
@@ -104,7 +102,7 @@ const ArchitectureViz = ({ architecture, nFeatures }) => {
       label: `Layer ${i + 1}`,
       neurons: l.neurons,
       activation: l.activation,
-      color: i === architecture.length - 1 ? 'bg-purple-500' : 'bg-indigo-500',
+      color: i === architecture.length - 1 ? 'bg-[#ff499e]' : 'bg-[#00f0ff]',
     })),
   ];
 
@@ -113,15 +111,13 @@ const ArchitectureViz = ({ architecture, nFeatures }) => {
       {allLayers.map((layer, idx) => (
         <React.Fragment key={idx}>
           <div className="flex flex-col items-center shrink-0">
-            <div className={`${layer.color} text-white text-xs font-bold px-3 py-2 rounded-lg min-w-[70px] text-center shadow-sm`}>
+            <div className={`${layer.color} text-black border-[3px] border-black text-xs font-black px-3 py-2 min-w-[70px] text-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}>
               {layer.label}
             </div>
-            <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1">{layer.neurons}N</p>
-            {layer.activation && <p className="text-[10px] text-gray-400 dark:text-gray-500">{layer.activation}</p>}
+            <p className="text-[10px] text-black font-bold mt-1">{layer.neurons}N</p>
+            {layer.activation && <p className="text-[10px] text-black font-bold uppercase">{layer.activation}</p>}
           </div>
-          {idx < allLayers.length - 1 && (
-            <div className="flex-1 h-px bg-gradient-to-r from-gray-300 dark:from-gray-600 to-gray-200 dark:to-gray-700 min-w-[20px] mt-[-16px]" />
-          )}
+            <div className="flex-1 h-[3px] bg-black min-w-[20px] mt-[-16px]" />
         </React.Fragment>
       ))}
     </div>
@@ -211,13 +207,13 @@ const DLStudio = ({ anomalyReport, config, setConfig }) => {
     <div className="flex h-full gap-0 -mx-8 -my-8 overflow-hidden">
 
       {/* ── Left Config Sidebar ──────────────────────────────── */}
-      <aside className="w-80 shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col overflow-y-auto shadow-sm transition-colors">
-        <div className="p-5 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+      <aside className="w-80 shrink-0 bg-[#ffe45e] border-r-[3px] border-black flex flex-col overflow-y-auto transition-none">
+        <div className="p-5 border-b-[3px] border-black bg-white">
           <div className="flex items-center gap-2">
-            <Network size={20} className="text-purple-600 dark:text-purple-400" />
-            <h2 className="font-semibold text-gray-800 dark:text-gray-100">Network Configuration</h2>
+            <Network size={24} className="text-black" strokeWidth={2.5} />
+            <h2 className="font-black text-black uppercase tracking-tight text-lg">Network Configuration</h2>
           </div>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Build and train a feedforward neural network</p>
+          <p className="text-xs font-bold text-gray-700 mt-1 uppercase">Build and train a feedforward neural network</p>
         </div>
 
         <div className="p-5 flex-1 flex flex-col gap-5">
@@ -235,25 +231,24 @@ const DLStudio = ({ anomalyReport, config, setConfig }) => {
                     results: null
                   }));
                 }}
-                className="text-[11px] font-bold text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
+                className="text-[11px] font-black text-black hover:underline cursor-pointer uppercase"
               >
                 {featureCols.length === numericColumns.length ? 'Deselect All' : 'Select All'}
               </button>
             </div>
-            <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden max-h-36 overflow-y-auto">
+            <div className="border-[3px] border-black bg-white max-h-36 overflow-y-auto shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               {numericColumns.length === 0
                 ? <p className="text-xs text-gray-400 dark:text-gray-500 p-3">No numeric columns available.</p>
                 : numericColumns.map(col => (
                     <label key={col} className="flex items-center gap-2 px-3 py-2 cursor-pointer
-                                                hover:bg-gray-50 dark:hover:bg-gray-700/50
-                                                border-b border-gray-100 dark:border-gray-700 last:border-0">
-                      <input type="checkbox" checked={featureCols.includes(col)} onChange={() => toggleFeature(col)} className="accent-purple-600" />
-                      <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{col}</span>
+                                                hover:bg-cyan-300 border-b-[3px] border-black last:border-b-0 transition-none">
+                      <input type="checkbox" checked={featureCols.includes(col)} onChange={() => toggleFeature(col)} className="w-4 h-4 border-2 border-black accent-black cursor-pointer" />
+                      <span className="text-sm font-bold text-black truncate">{col}</span>
                     </label>
                   ))
               }
             </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{featureCols.length} selected</p>
+            <p className="text-xs font-bold text-black mt-2 uppercase">{featureCols.length} selected</p>
           </div>
 
           {/* Target column */}
@@ -262,9 +257,7 @@ const DLStudio = ({ anomalyReport, config, setConfig }) => {
             <select
               value={targetCol}
               onChange={(e) => setConfig(prev => ({ ...prev, targetCol: e.target.value, results: null }))}
-              className="w-full text-sm border border-gray-200 dark:border-gray-600 rounded-lg p-2
-                         bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100
-                         focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="neo-input p-2 w-full cursor-pointer"
             >
               <option value="">Select target column...</option>
               {allColumns.map(c => <option key={c} value={c}>{c}</option>)}
@@ -286,7 +279,7 @@ const DLStudio = ({ anomalyReport, config, setConfig }) => {
               <SectionTitle>4. Hidden Layers</SectionTitle>
               <button
                 onClick={addLayer}
-                className="flex items-center gap-1 text-xs text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-medium cursor-pointer"
+                className="flex items-center gap-1 text-xs text-black border-2 border-black bg-white px-2 py-1 font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-none uppercase"
               >
                 <Plus size={14} /> Add Layer
               </button>
@@ -298,8 +291,8 @@ const DLStudio = ({ anomalyReport, config, setConfig }) => {
 
             <div className="space-y-2">
               {hiddenLayers.map((layer, i) => (
-                <div key={i} className="flex items-center gap-2 p-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700/50">
-                  <div className="w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 flex items-center justify-center text-[10px] font-bold shrink-0">
+                <div key={i} className="flex items-center gap-2 p-2 border-[3px] border-black bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="w-6 h-6 border-[2px] border-black bg-[#ff499e] text-white flex items-center justify-center text-xs font-black shrink-0">
                     {i + 1}
                   </div>
                   <input
@@ -307,17 +300,14 @@ const DLStudio = ({ anomalyReport, config, setConfig }) => {
                     value={layer.neurons}
                     min={1}
                     onChange={e => updateLayer(i, 'neurons', e.target.value)}
-                    className="w-16 text-xs border border-gray-200 dark:border-gray-600 rounded p-1 text-center
-                               bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200
-                               focus:outline-none focus:ring-1 focus:ring-purple-400"
+                    className="w-16 neo-input p-1 text-center"
                     title="Neurons"
                   />
-                  <span className="text-xs text-gray-400 dark:text-gray-500">N</span>
+                  <span className="text-xs font-black text-black">N</span>
                   <select
                     value={layer.activation}
                     onChange={e => updateLayer(i, 'activation', e.target.value)}
-                    className="flex-1 text-xs border border-gray-200 dark:border-gray-600 rounded p-1
-                               bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none"
+                    className="flex-1 neo-input p-1 cursor-pointer"
                   >
                     <option value="relu">ReLU</option>
                     <option value="sigmoid">Sigmoid</option>
@@ -325,7 +315,7 @@ const DLStudio = ({ anomalyReport, config, setConfig }) => {
                   </select>
                   <button
                     onClick={() => removeLayer(i)}
-                    className="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 transition-colors cursor-pointer"
+                    className="text-black bg-red-400 border-[2px] border-black p-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -342,17 +332,17 @@ const DLStudio = ({ anomalyReport, config, setConfig }) => {
           <button
             onClick={handleTrain}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-60 cursor-pointer shadow-sm mt-auto"
+            className="w-full flex items-center justify-center gap-2 neo-btn py-4 text-xl mt-auto bg-[#ff499e]"
           >
             {isLoading
-              ? <><Loader size={18} className="animate-spin" /> Training...</>
-              : <><Play size={18} /> Train Neural Network</>}
+              ? <><Loader size={24} className="animate-spin" /> TRAINING...</>
+              : <><Play size={24} /> TRAIN NETWORK</>}
           </button>
         </div>
       </aside>
 
       {/* ── Results Canvas ────────────────────────────────────── */}
-      <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#121212] p-8 transition-colors">
+      <main className="flex-1 overflow-y-auto bg-white dot-grid p-8 transition-none">
 
         {error && (
           <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-xl mb-6 text-red-700 dark:text-red-300">

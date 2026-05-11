@@ -217,24 +217,24 @@ function App() {
               anomalyReport={anomalyReport}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
-              <div className="p-4 bg-gray-200 dark:bg-gray-700 rounded-full mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div className="flex flex-col items-center justify-center h-full text-black">
+              <div className="p-4 bg-[#ff499e] border-[3px] border-black rounded-full mb-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">No Data Available</h3>
-              <p className="mt-2 text-sm">Upload a CSV or load a demo dataset to start building your dashboard.</p>
+              <h3 className="text-2xl font-black text-black uppercase">No Data Available</h3>
+              <p className="mt-2 text-sm font-bold uppercase">Upload a CSV or load a demo dataset to start building your dashboard.</p>
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => setCurrentView('data-prep')}
-                  className="bg-blue-600 text-white px-5 py-2 rounded shadow hover:bg-blue-700 cursor-pointer transition-colors text-sm"
+                  className="neo-btn neo-btn-primary px-5 py-2"
                 >
-                  Go to Data Prep
+                  GO TO DATA PREP
                 </button>
                 <button
                   onClick={() => setShowDemoModal(true)}
-                  className="border border-blue-400 text-blue-600 dark:text-blue-400 px-5 py-2 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30 cursor-pointer transition-colors text-sm"
+                  className="neo-btn px-5 py-2 bg-white"
                 >
-                  Try Demo Dataset
+                  TRY DEMO DATASET
                 </button>
               </div>
             </div>

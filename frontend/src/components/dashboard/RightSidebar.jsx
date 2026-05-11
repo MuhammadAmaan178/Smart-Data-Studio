@@ -3,13 +3,13 @@ import { Type, Calculator, BarChart2, ArrowLeft, Loader } from 'lucide-react';
 import { generateChart, getMetrics } from '../../api/client';
 
 // ── Shared form primitives ────────────────────────────────────────
-const labelCls  = "block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1";
-const selectCls = "w-full text-sm border border-gray-200 dark:border-gray-600 rounded p-1.5 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400";
-const inputCls  = "w-full text-sm border border-gray-200 dark:border-gray-600 rounded p-1.5 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400";
+const labelCls  = "block text-xs font-black text-black mb-1 uppercase";
+const selectCls = "w-full text-sm border-[3px] border-black p-1.5 bg-white text-black focus:outline-none cursor-pointer";
+const inputCls  = "w-full text-sm border-[3px] border-black p-1.5 bg-white text-black placeholder-gray-400 focus:outline-none";
 
 // ── Mini section title ────────────────────────────────────────────
 const ST = ({ children }) => (
-  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+  <p className="text-sm font-black uppercase tracking-wider text-black mb-1.5">
     {children}
   </p>
 );
@@ -19,10 +19,10 @@ const ToggleBtn = ({ active, onClick, children, title }) => (
   <button
     title={title}
     onClick={onClick}
-    className={`flex-1 py-1.5 text-xs font-medium rounded transition-colors cursor-pointer ${
+    className={`flex-1 py-1.5 text-xs font-black uppercase border-[3px] border-black transition-none cursor-pointer ${
       active
-        ? 'bg-blue-600 text-white'
-        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+        ? 'bg-black text-[#ffe45e]'
+        : 'bg-white text-black hover:bg-cyan-300'
     }`}
   >
     {children}
@@ -35,15 +35,15 @@ const ColorPicker = ({ label, value, onChange }) => {
   return (
     <div>
       <ST>{label}</ST>
-      <div className="flex items-center gap-2 border border-gray-200 dark:border-gray-600 rounded p-1.5 bg-white dark:bg-gray-700">
+      <div className="flex items-center gap-2 border-[3px] border-black p-1.5 bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
         <input
           type="color"
           value={isEmpty ? '#ffffff' : value}
           onChange={e => onChange(e.target.value)}
-          className="w-8 h-7 rounded cursor-pointer border-0 bg-transparent p-0"
+          className="w-8 h-8 cursor-pointer border-0 p-0"
           title={`Pick ${label.toLowerCase()}`}
         />
-        <span className="text-xs font-mono text-gray-600 dark:text-gray-300 flex-1">
+        <span className="text-xs font-bold text-black flex-1 uppercase">
           {isEmpty ? 'transparent' : value}
         </span>
         {!isEmpty && (
@@ -162,18 +162,15 @@ const ToolboxMode = () => {
           key={type}
           draggable
           onDragStart={(e) => handleDragStart(e, type)}
-          className="border border-gray-200 dark:border-gray-600 rounded-lg p-4
-                     bg-white dark:bg-gray-700
-                     hover:border-blue-400 dark:hover:border-blue-500
-                     hover:shadow-md transition-all cursor-grab active:cursor-grabbing group"
+          className="border-[3px] border-black p-4 mb-4 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-none cursor-grab active:cursor-grabbing group"
         >
           <div className="flex items-center space-x-3 mb-1">
-            <div className="p-2 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 rounded-lg group-hover:bg-blue-100 dark:group-hover:bg-blue-900/60 transition-colors">
+            <div className="p-2 border-[3px] border-black bg-[#ffe45e] text-black">
               <Icon size={18} />
             </div>
-            <h3 className="font-medium text-gray-800 dark:text-gray-200 text-sm">{label}</h3>
+            <h3 className="font-black text-black text-sm uppercase">{label}</h3>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed pl-11">{desc}</p>
+          <p className="text-xs font-bold text-gray-700 leading-relaxed pl-12">{desc}</p>
         </div>
       ))}
     </div>
@@ -233,7 +230,7 @@ const ChartProperties = ({ anomalyReport, onUpdateChart }) => {
 
   return (
     <div className="p-4 space-y-4 overflow-y-auto flex-1">
-      <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Chart Configuration</h4>
+      <h4 className="text-xl font-black uppercase tracking-tight text-black border-b-[3px] border-black pb-2 mb-4">Chart Config</h4>
 
       {error && <div className="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 p-2 rounded border border-red-200 dark:border-red-700">{error}</div>}
 
@@ -340,8 +337,8 @@ const ChartProperties = ({ anomalyReport, onUpdateChart }) => {
                 </select>
               </div>
               <div className="flex items-center gap-2">
-                <input type="checkbox" id="dodge" checked={dodge} onChange={e => setDodge(e.target.checked)} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                <label htmlFor="dodge" className="text-xs text-gray-700 dark:text-gray-300 cursor-pointer">Dodge Bars</label>
+                <input type="checkbox" id="dodge" checked={dodge} onChange={e => setDodge(e.target.checked)} className="w-4 h-4 border-2 border-black accent-black cursor-pointer" />
+                <label htmlFor="dodge" className="text-xs font-black text-black uppercase cursor-pointer">Dodge Bars</label>
               </div>
             </div>
           )}
@@ -352,8 +349,8 @@ const ChartProperties = ({ anomalyReport, onUpdateChart }) => {
                 <input type="number" value={linewidth} onChange={e => setLinewidth(e.target.value)} className={inputCls} />
               </div>
               <div className="flex items-center gap-2">
-                <input type="checkbox" id="markers" checked={showMarkers} onChange={e => setShowMarkers(e.target.checked)} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                <label htmlFor="markers" className="text-xs text-gray-700 dark:text-gray-300 cursor-pointer">Show Markers</label>
+                <input type="checkbox" id="markers" checked={showMarkers} onChange={e => setShowMarkers(e.target.checked)} className="w-4 h-4 border-2 border-black accent-black cursor-pointer" />
+                <label htmlFor="markers" className="text-xs font-black text-black uppercase cursor-pointer">Show Markers</label>
               </div>
             </div>
           )}
@@ -364,8 +361,8 @@ const ChartProperties = ({ anomalyReport, onUpdateChart }) => {
                 <input type="number" value={bins} onChange={e => setBins(e.target.value)} className={inputCls} />
               </div>
               <div className="flex items-center gap-2">
-                <input type="checkbox" id="kde" checked={kde} onChange={e => setKde(e.target.checked)} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                <label htmlFor="kde" className="text-xs text-gray-700 dark:text-gray-300 cursor-pointer">Show KDE Curve</label>
+                <input type="checkbox" id="kde" checked={kde} onChange={e => setKde(e.target.checked)} className="w-4 h-4 border-2 border-black accent-black cursor-pointer" />
+                <label htmlFor="kde" className="text-xs font-black text-black uppercase cursor-pointer">Show KDE Curve</label>
               </div>
             </div>
           )}
@@ -382,8 +379,8 @@ const ChartProperties = ({ anomalyReport, onUpdateChart }) => {
       )}
 
       <button onClick={handleUpdate} disabled={isLoading}
-        className="w-full mt-4 bg-blue-600 text-white py-2 rounded text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-blue-500/20">
-        {isLoading ? <><Loader size={14} className="animate-spin" /> Generating...</> : 'Update Chart'}
+        className="w-full mt-4 neo-btn neo-btn-primary py-3 text-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
+        {isLoading ? <><Loader size={20} className="animate-spin" /> GENERATING...</> : 'UPDATE CHART'}
       </button>
     </div>
   );
@@ -440,7 +437,7 @@ const MetricProperties = ({ anomalyReport, onUpdateMetric, onUpdateMetricSetting
 
   return (
     <div className="p-4 space-y-4 overflow-y-auto flex-1">
-      <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Metric Settings</h4>
+      <h4 className="text-xl font-black uppercase tracking-tight text-black border-b-[3px] border-black pb-2 mb-4">Metric Settings</h4>
 
       {/* ── Data section ───────────────────────────────────────── */}
       <div className="space-y-3 pb-3 border-b border-gray-100 dark:border-gray-700">
@@ -461,8 +458,8 @@ const MetricProperties = ({ anomalyReport, onUpdateMetric, onUpdateMetricSetting
         </div>
 
         <button onClick={handleCalculate} disabled={!column || isLoading}
-          className="w-full bg-blue-600 text-white py-2 rounded text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer">
-          {isLoading ? <><Loader size={14} className="animate-spin" /> Calculating...</> : 'Calculate'}
+          className="w-full neo-btn neo-btn-primary py-3 flex items-center justify-center gap-2 cursor-pointer">
+          {isLoading ? <><Loader size={20} className="animate-spin" /> CALCULATING...</> : 'CALCULATE'}
         </button>
       </div>
 
@@ -482,9 +479,9 @@ const MetricProperties = ({ anomalyReport, onUpdateMetric, onUpdateMetricSetting
       {/* Apply styles */}
       <button
         onClick={() => onUpdateMetricSettings({ ...s, column, metricType })}
-        className="w-full bg-indigo-600 text-white py-2 rounded text-sm font-medium hover:bg-indigo-700 transition-colors cursor-pointer"
+        className="w-full mt-4 neo-btn py-3 text-lg cursor-pointer bg-[#ffe45e]"
       >
-        Apply Styles
+        APPLY STYLES
       </button>
     </div>
   );
@@ -506,7 +503,7 @@ const HeadingProperties = ({ currentSettings, onUpdateHeading }) => {
 
   return (
     <div className="p-4 space-y-4 overflow-y-auto flex-1">
-      <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Heading Settings</h4>
+      <h4 className="text-xl font-black uppercase tracking-tight text-black border-b-[3px] border-black pb-2 mb-4">Heading Settings</h4>
 
       {/* Content */}
       <div>
@@ -533,9 +530,9 @@ const HeadingProperties = ({ currentSettings, onUpdateHeading }) => {
       {/* Apply */}
       <button
         onClick={() => onUpdateHeading(s)}
-        className="w-full bg-blue-600 text-white py-2 rounded text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer"
+        className="w-full mt-4 neo-btn neo-btn-primary py-3 text-lg cursor-pointer"
       >
-        Apply
+        APPLY STYLES
       </button>
     </div>
   );
@@ -551,24 +548,24 @@ const RightSidebar = ({
   const isPropertiesMode = !!selectedCard;
 
   return (
-    <aside className="w-80 h-full bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col shadow-lg z-10 transition-colors duration-300">
+    <aside className="w-80 h-full bg-[#00f0ff] border-l-[3px] border-black flex flex-col shadow-none z-10 transition-none">
       {/* Header */}
-      <div className="py-4 px-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 flex items-center justify-between shrink-0">
+      <div className="py-4 px-6 border-b-[3px] border-black bg-white flex items-center justify-between shrink-0">
         {isPropertiesMode ? (
           <>
             <div>
-              <h2 className="text-base font-semibold text-gray-800 dark:text-gray-100">Properties</h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{selectedCard.type} Widget</p>
+              <h2 className="text-xl font-black text-black uppercase tracking-tight">Properties</h2>
+              <p className="text-xs font-bold text-gray-700 uppercase">{selectedCard.type} Widget</p>
             </div>
             <button onClick={() => setSelectedWidgetId(null)}
-              className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer">
-              <ArrowLeft size={14} /> Toolbox
+              className="flex items-center gap-1 text-xs font-black text-black border-[3px] border-black px-2 py-1 bg-[#ffe45e] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none cursor-pointer uppercase transition-none">
+              <ArrowLeft size={16} strokeWidth={3} /> TOOLBOX
             </button>
           </>
         ) : (
           <div>
-            <h2 className="text-base font-semibold text-gray-800 dark:text-gray-100">Toolbox</h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Drag items onto the canvas</p>
+            <h2 className="text-xl font-black text-black uppercase tracking-tight">Toolbox</h2>
+            <p className="text-xs font-bold text-gray-700 uppercase">Drag items onto canvas</p>
           </div>
         )}
       </div>

@@ -6,13 +6,13 @@ import InferencePanel from '../shared/InferencePanel';
 // ─── Shared dark-aware primitives ────────────────────────────────
 const Section = ({ title, children }) => (
   <div className="mb-5">
-    <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">{title}</p>
+    <p className="text-sm font-black uppercase tracking-wider text-black mb-2">{title}</p>
     {children}
   </div>
 );
 
 const Label = ({ children }) => (
-  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{children}</label>
+  <label className="block text-xs font-black text-black mb-1 uppercase">{children}</label>
 );
 
 const Select = ({ value, onChange, children, disabled }) => (
@@ -20,9 +20,7 @@ const Select = ({ value, onChange, children, disabled }) => (
     value={value}
     onChange={onChange}
     disabled={disabled}
-    className="w-full text-sm border border-gray-200 dark:border-gray-600 rounded-lg p-2
-               bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100
-               focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+    className="neo-input p-2 w-full disabled:opacity-50 cursor-pointer"
   >
     {children}
   </select>
@@ -37,10 +35,7 @@ const Input = ({ label, value, onChange, type = 'number', min, placeholder }) =>
       onChange={onChange}
       min={min}
       placeholder={placeholder}
-      className="w-full text-sm border border-gray-200 dark:border-gray-600 rounded-lg p-2
-                 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100
-                 placeholder-gray-400 dark:placeholder-gray-500
-                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      className="neo-input p-2 w-full"
     />
   </div>
 );
@@ -131,7 +126,7 @@ const ClusterPreview = ({ labels, nClusters }) => {
 
 // ─── Result card reusable shell ───────────────────────────────────
 const ResultCard = ({ children, className = '' }) => (
-  <div className={`bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm ${className}`}>
+  <div className={`neo-card ${className}`}>
     {children}
   </div>
 );
@@ -219,13 +214,13 @@ const MLStudio = ({ anomalyReport, config, setConfig }) => {
     <div className="flex h-full gap-0 -mx-8 -my-8 overflow-hidden">
 
       {/* ── Left Config Sidebar ──────────────────────────────── */}
-      <aside className="w-80 shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col overflow-y-auto shadow-sm transition-colors">
-        <div className="p-5 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+      <aside className="w-80 shrink-0 bg-[#ffe45e] border-r-[3px] border-black flex flex-col overflow-y-auto transition-none">
+        <div className="p-5 border-b-[3px] border-black bg-white">
           <div className="flex items-center gap-2">
-            <BrainCircuit size={20} className="text-indigo-600 dark:text-indigo-400" />
-            <h2 className="font-semibold text-gray-800 dark:text-gray-100">Model Configuration</h2>
+            <BrainCircuit size={24} className="text-black" strokeWidth={2.5} />
+            <h2 className="font-black text-black uppercase tracking-tight text-lg">Model Configuration</h2>
           </div>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Configure and run your ML pipeline</p>
+          <p className="text-xs font-bold text-gray-700 mt-1 uppercase">Configure and run your ML pipeline</p>
         </div>
 
         <div className="p-5 flex-1 flex flex-col">
@@ -296,24 +291,23 @@ const MLStudio = ({ anomalyReport, config, setConfig }) => {
                     setConfig(prev => ({ ...prev, featureCols: numericColumns.filter(c => c !== targetCol) }));
                   }
                 }}
-                className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                className="text-[11px] font-black text-black hover:underline cursor-pointer uppercase"
               >
                 {featureCols.length === numericColumns.length ? 'Deselect All' : 'Select All'}
               </button>
             </div>
-            <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden max-h-44 overflow-y-auto">
+            <div className="border-[3px] border-black bg-white max-h-44 overflow-y-auto shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               {numericColumns.length === 0 ? (
                 <p className="text-xs text-gray-400 dark:text-gray-500 p-3">No numeric columns available.</p>
               ) : numericColumns.map(col => (
                 <label key={col} className="flex items-center gap-2 px-3 py-2 cursor-pointer
-                                            hover:bg-gray-50 dark:hover:bg-gray-700/50
-                                            border-b border-gray-100 dark:border-gray-700 last:border-0">
-                  <input type="checkbox" checked={featureCols.includes(col)} onChange={() => toggleFeature(col)} className="accent-blue-600" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{col}</span>
+                                            hover:bg-cyan-300 border-b-[3px] border-black last:border-0 transition-none">
+                  <input type="checkbox" checked={featureCols.includes(col)} onChange={() => toggleFeature(col)} className="w-4 h-4 border-2 border-black accent-black cursor-pointer" />
+                  <span className="text-sm font-bold text-black truncate">{col}</span>
                 </label>
               ))}
             </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{featureCols.length} column{featureCols.length !== 1 ? 's' : ''} selected</p>
+            <p className="text-xs font-bold text-black mt-2 uppercase">{featureCols.length} column{featureCols.length !== 1 ? 's' : ''} selected</p>
           </Section>
 
           {task === 'classification' && (
@@ -332,16 +326,16 @@ const MLStudio = ({ anomalyReport, config, setConfig }) => {
             <button
               onClick={handleRun}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-60 cursor-pointer shadow-sm"
+              className="w-full flex items-center justify-center gap-2 neo-btn neo-btn-danger py-4 text-xl"
             >
-              {isLoading ? <><Loader size={18} className="animate-spin" /> Running Model...</> : <><Play size={18} /> Run Model</>}
+              {isLoading ? <><Loader size={24} className="animate-spin" /> RUNNING...</> : <><Play size={24} /> RUN MODEL</>}
             </button>
           </div>
         </div>
       </aside>
 
       {/* ── Results Canvas ────────────────────────────────────── */}
-      <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#121212] p-8 transition-colors">
+      <main className="flex-1 overflow-y-auto bg-white dot-grid p-8 transition-none">
 
         {error && (
           <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-xl mb-6 text-red-700 dark:text-red-300">

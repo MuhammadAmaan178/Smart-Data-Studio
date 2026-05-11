@@ -16,25 +16,20 @@ const Sidebar = ({ currentView, setCurrentView, isOpen, toggleSidebar }) => {
   return (
     <aside
       className={`h-full flex flex-col shrink-0
-                  bg-gray-50 dark:bg-gray-800
-                  border-r border-gray-200 dark:border-gray-700
-                  transition-all duration-300 ease-in-out
+                  bg-[#ffe45e] border-r-[3px] border-black
+                  transition-none
                   ${isOpen ? 'w-64' : 'w-16'}`}
     >
       {/* Toggle button */}
-      <div className={`flex items-center h-10 px-3 border-b
-                       border-gray-200 dark:border-gray-700
+      <div className={`flex items-center h-12 px-3 border-b-[3px] border-black
                        ${isOpen ? 'justify-end' : 'justify-center'}`}>
         <button
           onClick={toggleSidebar}
           title={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}
-          className="p-1.5 rounded-md cursor-pointer
-                     text-gray-400 dark:text-gray-500
-                     hover:bg-gray-200 dark:hover:bg-gray-700
-                     hover:text-gray-700 dark:hover:text-gray-200
-                     transition-colors"
+          className="p-1 cursor-pointer text-black bg-white border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                     hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-none"
         >
-          {isOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+          {isOpen ? <ChevronLeft size={20} strokeWidth={3} /> : <ChevronRight size={20} strokeWidth={3} />}
         </button>
       </div>
 
@@ -47,16 +42,15 @@ const Sidebar = ({ currentView, setCurrentView, isOpen, toggleSidebar }) => {
               key={id}
               onClick={() => setCurrentView(id)}
               title={!isOpen ? label : undefined}
-              className={`w-full flex items-center gap-3 px-2.5 py-2.5 rounded-lg
-                          transition-all duration-200 cursor-pointer text-left
+              className={`w-full flex items-center gap-3 px-3 py-3 font-black uppercase tracking-wider
+                          border-[3px] border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]
+                          transition-none cursor-pointer text-left
                           ${isActive
-                            ? 'bg-blue-600 text-white shadow-sm'
-                            : `text-gray-500 dark:text-gray-400
-                               hover:bg-gray-200 dark:hover:bg-gray-700
-                               hover:text-gray-900 dark:hover:text-gray-100`
+                            ? 'bg-black text-[#ffe45e] shadow-none translate-x-[3px] translate-y-[3px]'
+                            : `bg-white text-black hover:bg-cyan-300`
                           }`}
             >
-              <Icon size={18} className="shrink-0" />
+              <Icon size={20} strokeWidth={2.5} className="shrink-0" />
 
               {/* Animated label */}
               <span
@@ -72,14 +66,14 @@ const Sidebar = ({ currentView, setCurrentView, isOpen, toggleSidebar }) => {
       </nav>
 
       {/* Version stamp (expanded only) */}
-      <div className={`px-3 py-3 border-t border-gray-200 dark:border-gray-700
-                       overflow-hidden transition-all duration-300
-                       ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
-        <p className="text-[10px] text-gray-400 dark:text-gray-600 whitespace-nowrap">
+      <div className={`px-3 py-3 border-t-[3px] border-black bg-white
+                       overflow-hidden transition-none
+                       ${isOpen ? 'block' : 'hidden'}`}>
+        <p className="text-[11px] font-black text-black uppercase">
           Smart DataStudio v1.0
         </p>
-        <p className="text-[10px] text-gray-400 dark:text-gray-700 whitespace-nowrap">
-          Flask · React · Tailwind v4
+        <p className="text-[9px] font-bold text-gray-500 uppercase">
+          Flask · React · Neo-Brutal
         </p>
       </div>
     </aside>

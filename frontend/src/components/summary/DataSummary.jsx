@@ -21,7 +21,7 @@ const DTYPE_COLORS = {
 const DtypeBadge = ({ dtype }) => {
   const key = Object.keys(DTYPE_COLORS).find(k => dtype.includes(k)) ?? 'default';
   return (
-    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${DTYPE_COLORS[key]}`}>
+    <span className="text-[10px] font-black px-2 py-0.5 uppercase border-2 border-black bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
       {dtype}
     </span>
   );
@@ -29,13 +29,13 @@ const DtypeBadge = ({ dtype }) => {
 
 // ─── Overview metric card ─────────────────────────────────────────
 const OverviewCard = ({ label, value, icon: Icon, accent }) => (
-  <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5 flex items-center gap-4 transition-colors">
-    <div className={`p-3 rounded-xl ${accent}`}>
-      <Icon size={22} className="text-white" />
+  <div className={`neo-card p-5 flex items-center gap-4 ${accent}`}>
+    <div className="p-3 border-[3px] border-black bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+      <Icon size={24} className="text-black" strokeWidth={2.5} />
     </div>
     <div>
-      <p className="text-2xl font-black text-gray-800 dark:text-gray-100 font-mono">{fmt(value)}</p>
-      <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{label}</p>
+      <p className="text-2xl font-black text-black font-mono">{fmt(value)}</p>
+      <p className="text-xs font-bold text-black mt-0.5 uppercase tracking-wider">{label}</p>
     </div>
   </div>
 );
@@ -54,15 +54,15 @@ const StatRow = ({ label, value, highlight }) => (
 
 // ─── Column Profile Card ──────────────────────────────────────────
 const ColumnCard = ({ col }) => (
-  <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+  <div className="neo-card flex flex-col h-full bg-white">
     {/* Header */}
-    <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+    <div className="flex items-center justify-between px-4 py-3 border-b-[3px] border-black bg-[#00f0ff]">
       <div className="flex items-center gap-2 min-w-0">
         {col.is_numeric
-          ? <TrendingUp size={14} className="text-indigo-500 shrink-0" />
-          : <Type size={14} className="text-green-500 shrink-0" />
+          ? <TrendingUp size={16} className="text-black shrink-0" strokeWidth={2.5} />
+          : <Type size={16} className="text-black shrink-0" strokeWidth={2.5} />
         }
-        <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate" title={col.name}>
+        <p className="text-sm font-black text-black uppercase tracking-wider truncate" title={col.name}>
           {col.name}
         </p>
       </div>
@@ -104,13 +104,13 @@ const ColumnCard = ({ col }) => (
 // ─── Health bar ───────────────────────────────────────────────────
 const HealthBar = ({ missing, total }) => {
   const pct   = total > 0 ? Math.round((missing / total) * 100) : 0;
-  const color = pct === 0 ? 'bg-green-500' : pct < 5 ? 'bg-yellow-400' : 'bg-red-500';
+  const color = pct === 0 ? 'bg-[#ffe45e]' : pct < 5 ? 'bg-orange-400' : 'bg-[#ff499e]';
   return (
     <div className="flex items-center gap-3">
-      <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-        <div className={`h-full ${color} transition-all`} style={{ width: `${Math.min(pct, 100)}%` }} />
+      <div className="flex-1 h-3 bg-white border-[2px] border-black overflow-hidden relative shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+        <div className={`h-full ${color} border-r-[2px] border-black transition-none`} style={{ width: `${Math.min(pct, 100)}%` }} />
       </div>
-      <span className="text-xs text-gray-500 dark:text-gray-400 w-10 text-right">{pct}%</span>
+      <span className="text-xs font-black text-black w-10 text-right">{pct}%</span>
     </div>
   );
 };
@@ -203,20 +203,21 @@ const DataSummary = ({ isDataLoaded }) => {
 
       {/* Overview Metric Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
-        <OverviewCard label="Total Rows"     value={overview.total_rows}     icon={Hash}          accent="bg-blue-500" />
-        <OverviewCard label="Total Columns"  value={overview.total_cols}     icon={FileText}      accent="bg-indigo-500" />
-        <OverviewCard label="Missing Cells"  value={overview.missing_cells}  icon={AlertTriangle} accent={overview.missing_cells  === 0 ? 'bg-green-500' : 'bg-orange-500'} />
-        <OverviewCard label="Duplicate Rows" value={overview.duplicate_rows} icon={AlertCircle}   accent={overview.duplicate_rows === 0 ? 'bg-green-500' : 'bg-red-500'} />
-        <OverviewCard label="Memory (KB)"    value={overview.memory_kb}      icon={TrendingUp}    accent="bg-purple-500" />
+        <OverviewCard label="Total Rows"     value={overview.total_rows}     icon={Hash}          accent="bg-[#ffe45e]" />
+        <OverviewCard label="Total Columns"  value={overview.total_cols}     icon={FileText}      accent="bg-[#00f0ff]" />
+        <OverviewCard label="Missing Cells"  value={overview.missing_cells}  icon={AlertTriangle} accent={overview.missing_cells  === 0 ? 'bg-[#ffe45e]' : 'bg-[#ff499e]'} />
+        <OverviewCard label="Duplicate Rows" value={overview.duplicate_rows} icon={AlertCircle}   accent={overview.duplicate_rows === 0 ? 'bg-[#ffe45e]' : 'bg-[#ff499e]'} />
+        <OverviewCard label="Memory (KB)"    value={overview.memory_kb}      icon={TrendingUp}    accent="bg-white" />
       </div>
 
       {/* Dataset Health */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5 transition-colors">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-gray-800 dark:text-gray-100">Dataset Health</h2>
-          <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400">
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500 inline-block" /> {numericCount} numeric</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500 inline-block" /> {categoricalCount} categorical</span>
+      {/* Dataset Health */}
+      <div className="neo-card p-5 bg-white">
+        <div className="flex items-center justify-between mb-4 border-b-[3px] border-black pb-3">
+          <h2 className="font-black text-black uppercase tracking-tight text-xl">Dataset Health</h2>
+          <div className="flex gap-4 text-xs font-bold text-black uppercase">
+            <span className="flex items-center gap-1"><span className="w-3 h-3 border-2 border-black bg-blue-400 inline-block" /> {numericCount} numeric</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 border-2 border-black bg-green-400 inline-block" /> {categoricalCount} categorical</span>
           </div>
         </div>
         <div className="space-y-3">
@@ -247,31 +248,27 @@ const DataSummary = ({ isDataLoaded }) => {
           </h2>
           <div className="flex items-center gap-2">
             {/* Type filter toggle */}
-            <div className="flex text-xs rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+            <div className="flex text-xs border-[3px] border-black font-black uppercase">
               {['all', 'numeric', 'categorical'].map(f => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`px-3 py-1.5 capitalize cursor-pointer transition-colors ${
+                  className={`px-3 py-1.5 cursor-pointer transition-none border-r-[3px] border-black last:border-r-0 ${
                     filter === f
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                      ? 'bg-black text-[#ffe45e]'
+                      : 'bg-white text-black hover:bg-cyan-300'
                   }`}
                 >
                   {f}
                 </button>
               ))}
             </div>
-            {/* Search */}
             <input
               type="text"
               placeholder="Search columns…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="text-sm border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1.5
-                         bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200
-                         placeholder-gray-400 dark:placeholder-gray-500
-                         focus:outline-none focus:ring-2 focus:ring-blue-400 w-44"
+              className="neo-input px-3 py-1.5 w-44 uppercase placeholder:text-gray-400"
             />
           </div>
         </div>

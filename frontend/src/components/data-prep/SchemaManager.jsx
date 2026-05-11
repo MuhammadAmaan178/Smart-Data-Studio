@@ -19,40 +19,39 @@ const SchemaManager = ({ anomalyReport, onQueueAction }) => {
 
   return (
     <div className="mb-8">
-      <div className="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
-        <h3 className="text-lg font-medium text-gray-800 dark:text-gray-100">Schema Management</h3>
+      <div className="flex justify-between items-center mb-4 border-b-[3px] border-black pb-2">
+        <h3 className="text-xl font-black text-black uppercase tracking-tight">Schema Management</h3>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center space-x-1 text-sm bg-indigo-50 dark:bg-indigo-900/40
-                     text-indigo-600 dark:text-indigo-300
-                     px-3 py-1 rounded
-                     hover:bg-indigo-100 dark:hover:bg-indigo-900/70
-                     transition-colors cursor-pointer font-medium"
+          className="flex items-center space-x-1 text-sm bg-[#00f0ff]
+                     text-black border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                     px-4 py-2 uppercase font-black
+                     hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+                     transition-none cursor-pointer"
         >
           <Plus size={16} />
           <span>Add Column</span>
         </button>
       </div>
 
-      <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
-        <table className="min-w-full bg-white dark:bg-gray-800 text-sm">
+      <div className="overflow-x-auto border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white">
+        <table className="min-w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-              <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Column</th>
-              <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Inferred Type</th>
-              <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Change Type</th>
-              <th className="py-2 px-4 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Delete</th>
+            <tr className="bg-black border-b-[3px] border-black">
+              <th className="py-2 px-4 text-left text-xs font-black text-white uppercase tracking-widest border-r-[3px] border-black">Column</th>
+              <th className="py-2 px-4 text-left text-xs font-black text-white uppercase tracking-widest border-r-[3px] border-black">Inferred Type</th>
+              <th className="py-2 px-4 text-left text-xs font-black text-white uppercase tracking-widest border-r-[3px] border-black">Change Type</th>
+              <th className="py-2 px-4 text-center text-xs font-black text-white uppercase tracking-widest">Delete</th>
             </tr>
           </thead>
           <tbody>
             {Object.entries(anomalyReport.columns).map(([col, info]) => (
-              <tr key={col} className="border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                <td className="py-2 px-4 font-medium text-gray-700 dark:text-gray-200">{col}</td>
-                <td className="py-2 px-4 text-gray-500 dark:text-gray-400">{info.inferred_type}</td>
-                <td className="py-2 px-4">
+              <tr key={col} className="border-b-[3px] border-black last:border-b-0 hover:bg-yellow-100 transition-none">
+                <td className="py-2 px-4 font-bold text-black border-r-[3px] border-black">{col}</td>
+                <td className="py-2 px-4 font-bold text-black border-r-[3px] border-black">{info.inferred_type}</td>
+                <td className="py-2 px-4 border-r-[3px] border-black">
                   <select
-                    className="border border-gray-300 dark:border-gray-600 rounded p-1 text-xs
-                               bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 capitalize"
+                    className="neo-input p-1 text-xs bg-white cursor-pointer w-full"
                     onChange={(e) => handleTypeChange(col, e.target.value)}
                     defaultValue={
                       info.inferred_type.includes('int')   ? 'int'     :
@@ -75,8 +74,8 @@ const SchemaManager = ({ anomalyReport, onQueueAction }) => {
                 <td className="py-2 px-4 text-center">
                   <button
                     onClick={() => handleDropColumn(col)}
-                    className="text-red-400 hover:text-red-600 dark:hover:text-red-400 transition-colors p-1.5 rounded
-                               hover:bg-red-50 dark:hover:bg-red-900/40 cursor-pointer inline-flex items-center justify-center"
+                    className="text-black bg-[#ff499e] border-[2px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] 
+                               active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-none p-1.5 cursor-pointer inline-flex items-center justify-center"
                     title="Drop Column"
                   >
                     <Trash2 size={16} />

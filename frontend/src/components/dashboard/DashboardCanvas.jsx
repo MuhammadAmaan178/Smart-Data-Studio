@@ -132,10 +132,10 @@ const DashboardCanvas = ({ cards, setCards, layout, setLayout, anomalyReport }) 
         {/* Empty state hint */}
         {cards.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-            <div className="text-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl px-10 py-8 border border-gray-200 dark:border-gray-700 shadow-sm">
+            <div className="text-center neo-card bg-[#00f0ff] px-10 py-8">
               <div className="text-5xl mb-3">📊</div>
-              <h2 className="text-lg font-semibold text-gray-600 dark:text-gray-300">Your canvas is empty</h2>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Drag a widget from the Toolbox on the right to get started</p>
+              <h2 className="text-xl font-black text-black uppercase tracking-tight">Your canvas is empty</h2>
+              <p className="text-sm font-bold text-black mt-1 uppercase">Drag a widget from the Toolbox on the right to get started</p>
             </div>
           </div>
         )}
@@ -160,17 +160,16 @@ const DashboardCanvas = ({ cards, setCards, layout, setLayout, anomalyReport }) 
               return (
                 <div
                   key={item.i}
-                  className="flex flex-col rounded-xl overflow-hidden shadow-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                  className="flex flex-col neo-card bg-white p-0 overflow-hidden"
                 >
                   {/* Drag Handle */}
-                  <div className="drag-handle w-full h-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-blue-200 dark:hover:bg-blue-900/50 cursor-grab active:cursor-grabbing transition-colors shrink-0 flex items-center justify-center">
-                    <div className="w-8 h-0.5 bg-gray-300 dark:bg-gray-600 rounded-full" />
+                  <div className="drag-handle w-full h-4 bg-[#ffe45e] border-b-[3px] border-black hover:bg-yellow-400 cursor-grab active:cursor-grabbing transition-none shrink-0 flex items-center justify-center">
+                    <div className="w-8 h-1 bg-black" />
                   </div>
 
-                  {/* Remove button (visible on hover) */}
                   <button
                     onClick={(e) => { e.stopPropagation(); handleRemoveCard(item.i); }}
-                    className="absolute top-0 right-1 z-20 text-[10px] text-gray-400 hover:text-red-500 transition-colors cursor-pointer leading-none py-0.5 px-1"
+                    className="absolute top-0 right-0 z-20 text-xs font-black text-black bg-[#ff499e] border-l-[3px] border-b-[3px] border-black hover:bg-red-500 transition-none cursor-pointer leading-none py-1 px-1.5"
                     title="Remove widget"
                   >✕</button>
 

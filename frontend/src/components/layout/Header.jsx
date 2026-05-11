@@ -25,20 +25,17 @@ const DropdownMenu = ({ label, items }) => {
     <div ref={ref} className="relative">
       <button
         onClick={() => setIsOpen(o => !o)}
-        className="flex items-center gap-1 px-3 py-1 rounded text-xs font-medium cursor-pointer
-                   text-gray-600 dark:text-gray-300
-                   hover:bg-gray-100 dark:hover:bg-gray-700
-                   transition-colors select-none"
+        className="flex items-center gap-1 px-3 py-1 text-xs font-black cursor-pointer
+                   text-black bg-white border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                   hover:bg-yellow-200 transition-none select-none uppercase"
       >
         {label}
         <ChevronDown size={11} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-54 z-50 rounded-lg shadow-2xl
-                        border overflow-hidden
-                        bg-white dark:bg-gray-800
-                        border-gray-200 dark:border-gray-600">
+        <div className="absolute top-full left-0 mt-2 w-54 z-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                        border-[3px] overflow-hidden bg-white border-black">
           {items.map((item, i) =>
             item === 'divider'
               ? <div key={i} className="border-t border-gray-100 dark:border-gray-700 my-1" />
@@ -47,11 +44,10 @@ const DropdownMenu = ({ label, items }) => {
                   key={i}
                   onClick={() => { item.action?.(); setIsOpen(false); }}
                   disabled={item.disabled}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-left
-                             text-gray-700 dark:text-gray-200
-                             hover:bg-gray-50 dark:hover:bg-gray-700
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-left font-bold
+                             text-black hover:bg-cyan-300
                              disabled:opacity-40 disabled:cursor-not-allowed
-                             transition-colors cursor-pointer"
+                             transition-none cursor-pointer uppercase"
                 >
                   {item.icon && (
                     <item.icon size={13} className="text-gray-400 dark:text-gray-500 shrink-0" />
@@ -85,19 +81,16 @@ const ProjectName = ({ name, setName }) => {
       onBlur={endEdit}
       onKeyDown={e => e.key === 'Enter' && inputRef.current?.blur()}
       autoFocus
-      className="text-sm font-medium border border-blue-400 rounded px-2 py-0.5 outline-none w-52
-                 bg-white dark:bg-gray-700
-                 text-gray-800 dark:text-gray-100"
+      className="text-sm font-black border-[3px] border-black px-2 py-0.5 outline-none w-52
+                 bg-yellow-200 text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
     />
   ) : (
     <button
       onClick={startEdit}
       title="Click to rename project"
-      className="text-sm font-medium px-2 py-0.5 rounded cursor-text border border-transparent
-                 text-gray-700 dark:text-gray-200
-                 hover:bg-gray-100 dark:hover:bg-gray-700
-                 hover:border-gray-300 dark:hover:border-gray-600
-                 transition-colors"
+      className="text-sm font-black px-2 py-0.5 cursor-text border-[3px] border-transparent
+                 text-black hover:bg-yellow-200 hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                 transition-none"
     >
       {name}
     </button>
@@ -152,27 +145,22 @@ const Header = ({
   ];
 
   return (
-    <header className="shrink-0 flex flex-col
-                       bg-white dark:bg-gray-900
-                       border-b border-gray-200 dark:border-gray-700
-                       transition-colors duration-300">
+    <header className="shrink-0 flex flex-col bg-[#fff8e7] border-b-[3px] border-black transition-none z-50">
 
       {/* ── Top Row ─────────────────────────────────────────── */}
-      <div className="flex items-center justify-between h-11 px-4
-                      border-b border-gray-100 dark:border-gray-800">
+      <div className="flex items-center justify-between h-14 px-4 border-b-[3px] border-black">
 
         {/* Left: Logo + Project Name */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 shrink-0">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600
-                            flex items-center justify-center text-white text-xs font-black shadow-sm">
+            <div className="w-8 h-8 bg-black flex items-center justify-center text-[#00f0ff] text-xl font-black shadow-[2px_2px_0px_0px_rgba(255,73,158,1)] border-2 border-black transform -rotate-3">
               S
             </div>
-            <span className="text-sm font-bold text-gray-900 dark:text-gray-100 hidden sm:block select-none">
+            <span className="text-sm font-black text-black tracking-widest hidden sm:block select-none uppercase">
               Smart DataStudio
             </span>
           </div>
-          <span className="text-gray-300 dark:text-gray-600 text-lg select-none">/</span>
+          <span className="text-black font-black text-lg select-none">/</span>
           <ProjectName name={projectName} setName={setProjectName} />
         </div>
 
@@ -180,10 +168,9 @@ const Header = ({
         <div className="flex items-center gap-3">
 
           {/* Connection badge */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium
-                          bg-green-50 dark:bg-green-900/30
-                          border border-green-200 dark:border-green-800
-                          text-green-700 dark:text-green-400">
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 text-[11px] font-black uppercase
+                          bg-lime-400 border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                          text-black">
             <Wifi size={11} />
             <span>Connected</span>
           </div>
@@ -204,10 +191,10 @@ const Header = ({
           </button>
 
           {/* User Avatar */}
-          <div className="w-7 h-7 rounded-full flex items-center justify-center
-                          text-white text-xs font-bold cursor-pointer
-                          bg-gradient-to-br from-purple-500 to-pink-500
-                          hover:opacity-80 transition-opacity shadow-sm">
+          <div className="w-8 h-8 border-[3px] border-black flex items-center justify-center
+                          text-black text-xs font-black cursor-pointer
+                          bg-pink-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                          hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-none">
             A
           </div>
         </div>
@@ -225,12 +212,10 @@ const Header = ({
         {/* ── "Try Demo" — top-level direct-action button ── */}
         <button
           onClick={onOpenDemoModal}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded
-                     text-blue-600 dark:text-blue-400
-                     bg-blue-50 dark:bg-blue-900/30
-                     hover:bg-blue-100 dark:hover:bg-blue-900/50
-                     border border-blue-200 dark:border-blue-800
-                     transition-colors cursor-pointer select-none"
+          className="flex items-center gap-1.5 px-4 py-1 text-xs font-black uppercase
+                     text-black bg-cyan-400 border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                     active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+                     transition-none cursor-pointer select-none"
           title="Load a standard demo dataset instantly"
         >
           <Sparkles size={12} />

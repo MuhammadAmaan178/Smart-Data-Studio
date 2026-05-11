@@ -39,32 +39,32 @@ const MetricCard = ({ id, metricData, settings, isSelected, onClick }) => {
 
   return (
     <div
-      className={`w-full h-full flex flex-col items-center justify-center rounded-lg p-4 transition-all cursor-pointer ${
-        hasBg ? '' : 'bg-white dark:bg-gray-800'
-      } ${s.textAlign} ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
+      className={`w-full h-full flex flex-col items-center justify-center p-4 transition-none cursor-pointer ${
+        hasBg ? '' : 'bg-white'
+      } ${s.textAlign} ${isSelected ? 'border-[3px] border-black outline outline-[3px] outline-[#ff499e]' : 'border-[3px] border-transparent'}`}
       style={wrapperStyle}
       onClick={onClick}
     >
       {metricData ? (
         <>
           {/* Label row */}
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2">
+          <p className="text-xs font-black uppercase tracking-widest text-black mb-2">
             {metricData.label} of {metricData.column}
           </p>
 
           {/* Value — all typography classes applied */}
           <p
-            className={`font-mono ${valueCls} ${!hasColor ? 'text-gray-800 dark:text-gray-100' : ''}`}
+            className={`font-mono ${valueCls} ${!hasColor ? 'text-black' : ''}`}
             style={valueStyle}
           >
             {metricData.value}
           </p>
         </>
       ) : (
-        <div className="flex flex-col items-center text-gray-400 dark:text-gray-500 select-none">
-          <Calculator size={32} className="mb-2 text-gray-300 dark:text-gray-600" />
-          <p className="text-sm font-medium">Metric Card</p>
-          <p className="text-xs mt-1">Click to configure</p>
+        <div className="flex flex-col items-center text-black select-none uppercase">
+          <Calculator size={36} className="mb-2 text-black" strokeWidth={2.5} />
+          <p className="text-sm font-black">Metric Card</p>
+          <p className="text-xs font-bold mt-1 text-gray-700">Click to configure</p>
         </div>
       )}
     </div>

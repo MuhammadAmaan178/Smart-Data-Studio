@@ -21,9 +21,8 @@ const AppLayout = ({
   return (
     /* ── Root: dark class lives here — ALL dark: utilities key off this ── */
     <div className={`h-screen w-screen overflow-hidden flex flex-col
-                     bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                     transition-colors duration-300
-                     ${theme === 'dark' ? 'dark' : ''}`}>
+                     bg-[#fff8e7] text-black font-medium
+                     transition-none`}>
 
       {/* IDE Header */}
       <div>
@@ -56,8 +55,8 @@ const AppLayout = ({
 
         {/* Main canvas */}
         <main 
-          className={`flex-1 min-w-0 transition-colors duration-300
-                      bg-gray-100 dark:bg-[#121212]
+          className={`flex-1 min-w-0 transition-none
+                      bg-[#ffffff] border-l-[3px] border-black
                       ${isDashboard ? 'overflow-hidden relative' : 'overflow-y-auto p-8'}`}
         >
           {children}

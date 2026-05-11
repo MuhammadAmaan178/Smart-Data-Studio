@@ -42,9 +42,9 @@ const HeadingCard = ({ id, settings, isSelected, onClick }) => {
 
   return (
     <div
-      className={`w-full h-full flex items-center rounded-lg px-4 py-2 transition-all cursor-pointer overflow-hidden ${
-        hasBg ? '' : 'bg-white dark:bg-gray-800'
-      } ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
+      className={`w-full h-full flex items-center px-4 py-2 transition-none cursor-pointer overflow-hidden ${
+        hasBg ? '' : 'bg-white'
+      } ${isSelected ? 'border-[3px] border-black outline outline-[3px] outline-[#ff499e]' : 'border-[3px] border-transparent'}`}
       style={wrapperStyle}
       onClick={onClick}
     >
@@ -56,10 +56,10 @@ const HeadingCard = ({ id, settings, isSelected, onClick }) => {
           {s.text}
         </span>
       ) : (
-        <div className="flex flex-col items-center justify-center w-full text-gray-400 dark:text-gray-500 select-none">
-          <Type size={22} className="mb-1 text-gray-300 dark:text-gray-600" />
-          <p className="text-xs font-medium">Heading Block</p>
-          <p className="text-[10px] mt-0.5 text-gray-400 dark:text-gray-500">Click to configure</p>
+        <div className="flex flex-col items-center justify-center w-full text-black select-none uppercase">
+          <Type size={24} className="mb-1 text-black" strokeWidth={3} />
+          <p className="text-xs font-black">Heading Block</p>
+          <p className="text-[10px] font-bold mt-0.5 text-gray-700">Click to configure</p>
         </div>
       )}
     </div>

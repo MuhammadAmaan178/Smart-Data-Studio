@@ -39,11 +39,11 @@ const DataCleaningUI = ({ anomalyReport, cleaningActions, setCleaningActions, se
   if (!anomalyReport) return null;
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 border-t-4 border-t-blue-500 col-span-1 transition-colors duration-300">
+    <div className="neo-card p-6 bg-[#00f0ff]">
 
       {/* Error Toast */}
       {errorToast && (
-        <div className="mb-6 p-4 bg-red-100 dark:bg-red-900/40 border-l-4 border-red-500 text-red-700 dark:text-red-300 flex items-start justify-between rounded shadow-sm animate-in fade-in slide-in-from-top-4">
+        <div className="mb-6 p-4 bg-pink-400 border-[3px] border-black text-black flex items-start justify-between shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <div className="flex items-center space-x-2">
             <AlertCircle size={20} className="shrink-0" />
             <span className="font-medium">{errorToast}</span>
@@ -57,18 +57,18 @@ const DataCleaningUI = ({ anomalyReport, cleaningActions, setCleaningActions, se
       {/* Schema Manager */}
       <SchemaManager anomalyReport={anomalyReport} onQueueAction={handleQueueAction} />
 
-      <div className="border-b border-gray-200 dark:border-gray-700 mb-6 pb-2">
-        <h3 className="text-lg font-medium text-gray-800 dark:text-gray-100">Missing Values & Anomalies</h3>
+      <div className="border-b-[3px] border-black mb-6 pb-2">
+        <h3 className="text-xl font-black text-black uppercase tracking-tight">Missing Values & Anomalies</h3>
       </div>
 
       {/* Anomalies banner */}
-      <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-700 rounded">
-        <p className="text-sm font-medium text-orange-800 dark:text-orange-300 mb-2">Dataset Anomalies</p>
+      <div className="mb-6 p-4 bg-[#ff499e] border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <p className="text-sm font-black text-black mb-2 uppercase">Dataset Anomalies</p>
         <div className="flex items-center justify-between">
-          <p className="text-sm text-orange-700 dark:text-orange-400">Total Duplicate Rows: <strong>{anomalyReport.total_duplicates}</strong></p>
+          <p className="text-sm font-bold text-black">Total Duplicate Rows: <strong className="bg-black text-white px-2 py-0.5 ml-1">{anomalyReport.total_duplicates}</strong></p>
           <button
             onClick={handleDropDuplicates}
-            className="bg-orange-100 dark:bg-orange-800/50 text-orange-700 dark:text-orange-300 px-3 py-1 rounded text-sm hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors cursor-pointer border border-orange-300 dark:border-orange-700 font-medium"
+            className="bg-white text-black px-4 py-2 text-sm neo-btn active:translate-x-[2px] active:translate-y-[2px]"
           >
             Queue Drop Duplicates
           </button>
@@ -77,18 +77,16 @@ const DataCleaningUI = ({ anomalyReport, cleaningActions, setCleaningActions, se
 
       {/* Missing value handlers */}
       <div className="space-y-4 mb-6">
-        <h4 className="font-medium text-gray-700 dark:text-gray-300">Handle Missing Values</h4>
+        <h4 className="font-black text-black uppercase tracking-tight">Handle Missing Values</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.entries(anomalyReport.columns).map(([col, info]) =>
             info.missing_values > 0 && (
-              <div key={col} className="flex flex-col gap-1 p-3 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded">
-                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                  {col} <span className="text-red-500 dark:text-red-400">({info.missing_values} missing)</span>
+              <div key={col} className="flex flex-col gap-1 p-3 bg-[#ffe45e] border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <span className="text-sm font-black text-black flex justify-between">
+                  {col} <span className="text-white bg-black px-1 border-2 border-black">({info.missing_values} missing)</span>
                 </span>
                 <select
-                  className="border border-gray-300 dark:border-gray-600 rounded p-1.5 text-sm
-                             bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200
-                             dark:placeholder-gray-400 mt-1"
+                  className="neo-input p-1.5 text-sm mt-1 bg-white cursor-pointer"
                   onChange={(e) => handleMissingActionChange(col, e.target.value)}
                   defaultValue=""
                 >
@@ -109,27 +107,24 @@ const DataCleaningUI = ({ anomalyReport, cleaningActions, setCleaningActions, se
       </div>
 
       {/* Action bar */}
-      <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between">
-        <div className="text-sm text-gray-600 dark:text-gray-400 mb-4 sm:mb-0">
-          <span className="font-semibold bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 rounded">
+      <div className="mt-8 pt-4 border-t-[3px] border-black flex flex-col sm:flex-row items-center justify-between">
+        <div className="text-sm font-black text-black mb-4 sm:mb-0 uppercase">
+          <span className="bg-black text-white px-2 py-1 mr-2 border-2 border-black">
             {cleaningActions.length}
-          </span> actions in queue
+          </span> ACTIONS IN QUEUE
         </div>
         <div className="flex space-x-3 w-full sm:w-auto">
           <button
             onClick={() => setCleaningActions([])}
-            className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600
-                       text-gray-700 dark:text-gray-300
-                       hover:bg-gray-100 dark:hover:bg-gray-700
-                       rounded transition-colors cursor-pointer font-medium"
+            className="w-full sm:w-auto px-4 py-2 neo-btn neo-btn-white"
             disabled={cleaningActions.length === 0}
           >
             Clear Queue
           </button>
           <button
             onClick={handleApplyCleaning}
-            className={`w-full sm:w-auto px-6 py-2 rounded font-medium transition-colors cursor-pointer shadow-sm flex items-center justify-center ${
-              cleaningActions.length > 0 ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-300 dark:bg-blue-800 text-white cursor-not-allowed'
+            className={`w-full sm:w-auto px-6 py-2 neo-btn flex items-center justify-center ${
+              cleaningActions.length > 0 ? 'neo-btn-primary' : 'bg-gray-300 cursor-not-allowed opacity-50'
             }`}
             disabled={cleaningActions.length === 0}
           >
