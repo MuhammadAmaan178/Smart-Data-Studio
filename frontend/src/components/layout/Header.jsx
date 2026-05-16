@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Database, Save, Download, Sun, Moon,
+  Database, Save, Download,
   PanelLeftClose, PanelLeftOpen, RefreshCw, Trash2,
   Wifi, ChevronDown, FolderOpen, Sparkles, FileText,
 } from 'lucide-react';
@@ -99,7 +99,7 @@ const ProjectName = ({ name, setName }) => {
 
 // ─── Main Header ──────────────────────────────────────────────────
 const Header = ({ 
-  theme, toggleTheme, sidebarOpen, toggleSidebar, onOpenDemoModal, 
+  sidebarOpen, toggleSidebar, onOpenDemoModal, 
   onFileUpload, projectName, setProjectName, onSaveWorkspace, onLoadWorkspace
 }) => {
   const fileInputRef = useRef(null);
@@ -127,11 +127,6 @@ const Header = ({
   ];
 
   const viewItems = [
-    {
-      label:  theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode',
-      icon:   theme === 'dark' ? Sun : Moon,
-      action: toggleTheme,
-    },
     {
       label:  sidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar',
       icon:   sidebarOpen ? PanelLeftClose : PanelLeftOpen,
@@ -175,21 +170,6 @@ const Header = ({
             <span>Connected</span>
           </div>
 
-          {/* Theme toggle */}
-          <button
-            onClick={toggleTheme}
-            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            className="p-1.5 rounded-lg cursor-pointer transition-colors
-                       text-gray-500 dark:text-gray-400
-                       hover:bg-gray-100 dark:hover:bg-gray-700
-                       hover:text-gray-900 dark:hover:text-gray-100"
-          >
-            {theme === 'dark'
-              ? <Sun  size={16} className="text-yellow-400" />
-              : <Moon size={16} />
-            }
-          </button>
-
           {/* User Avatar */}
           <div className="w-8 h-8 border-[3px] border-black flex items-center justify-center
                           text-black text-xs font-black cursor-pointer
@@ -200,52 +180,54 @@ const Header = ({
         </div>
       </div>
 
-      {/* ── Menu Bar (bottom row) ─────────────────────────── */}
-      <div className="flex items-center gap-0.5 h-8 px-2">
-        <DropdownMenu label="File"    items={fileItems}    />
-        <DropdownMenu label="View"    items={viewItems}    />
-        <DropdownMenu label="Runtime" items={runtimeItems} />
+      {/* ── Menu Bar Wrapper (bottom row) ─────────────────────────── */}
+      <div>
+        <div className="flex items-center gap-0.5 h-8 px-2 relative">
+          <DropdownMenu label="File"    items={fileItems}    />
+          <DropdownMenu label="View"    items={viewItems}    />
+          <DropdownMenu label="Runtime" items={runtimeItems} />
 
-        {/* Separator */}
-        <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+          {/* Separator */}
+          <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
 
-        {/* ── "Try Demo" — top-level direct-action button ── */}
-        <button
-          onClick={onOpenDemoModal}
-          className="flex items-center gap-1.5 px-4 py-1 text-xs font-black uppercase
-                     text-black bg-cyan-400 border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
-                     active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
-                     transition-none cursor-pointer select-none"
-          title="Load a standard demo dataset instantly"
-        >
-          <Sparkles size={12} />
-          Try Demo
-        </button>
+          {/* ── "Try Demo" — top-level direct-action button ── */}
+          <button
+            onClick={onOpenDemoModal}
+            className="flex items-center gap-1.5 px-4 py-1 text-xs font-black uppercase
+                       text-black bg-cyan-400 border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                       active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+                       transition-none cursor-pointer select-none"
+            title="Load a standard demo dataset instantly"
+          >
+            <Sparkles size={12} />
+            Try Demo
+          </button>
 
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          className="hidden" 
-          accept=".csv" 
-          onChange={(e) => {
-            if (e.target.files[0]) {
-              onFileUpload(e.target.files[0]);
-              e.target.value = ''; // Reset for same-file re-upload
-            }
-          }} 
-        />
-        <input 
-          type="file" 
-          ref={sdsInputRef} 
-          className="hidden" 
-          accept=".sds" 
-          onChange={(e) => {
-            if (e.target.files[0]) {
-              onLoadWorkspace(e.target.files[0]);
-              e.target.value = '';
-            }
-          }} 
-        />
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            className="hidden" 
+            accept=".csv" 
+            onChange={(e) => {
+              if (e.target.files[0]) {
+                onFileUpload(e.target.files[0]);
+                e.target.value = ''; // Reset for same-file re-upload
+              }
+            }} 
+          />
+          <input 
+            type="file" 
+            ref={sdsInputRef} 
+            className="hidden" 
+            accept=".sds" 
+            onChange={(e) => {
+              if (e.target.files[0]) {
+                onLoadWorkspace(e.target.files[0]);
+                e.target.value = '';
+              }
+            }} 
+          />
+        </div>
       </div>
     </header>
   );

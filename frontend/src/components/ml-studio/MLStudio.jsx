@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useContext } from 'react';
 import { BrainCircuit, Play, Loader, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { runML } from '../../api/client';
 import InferencePanel from '../shared/InferencePanel';
@@ -215,7 +215,7 @@ const MLStudio = ({ anomalyReport, config, setConfig }) => {
 
       {/* ── Left Config Sidebar ──────────────────────────────── */}
       <aside className="w-80 shrink-0 bg-[#ffe45e] border-r-[3px] border-black flex flex-col overflow-y-auto transition-none">
-        <div className="p-5 border-b-[3px] border-black bg-white">
+        <div className="p-5 border-b-[3px] border-black bg-white z-0">
           <div className="flex items-center gap-2">
             <BrainCircuit size={24} className="text-black" strokeWidth={2.5} />
             <h2 className="font-black text-black uppercase tracking-tight text-lg">Model Configuration</h2>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FileText, AlertCircle, Loader, Hash, Type, TrendingUp, AlertTriangle, Database } from 'lucide-react';
-import { getSummary } from '../../api/client';
+import { getSummary, getCorrelationMatrix } from '../../api/client';
 
 // ─── Helpers ─────────────────────────────────────────────────────
 const fmt = (val) => {
@@ -9,119 +9,110 @@ const fmt = (val) => {
   return val;
 };
 
-// ─── Dtype badge colours (light + dark variants) ──────────────────
-const DTYPE_COLORS = {
-  int:     'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
-  float:   'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300',
-  object:  'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300',
-  bool:    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300',
-  default: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
-};
-
+// ─── Dtype badge colours ─────────────────────────────────────────
 const DtypeBadge = ({ dtype }) => {
-  const key = Object.keys(DTYPE_COLORS).find(k => dtype.includes(k)) ?? 'default';
   return (
-    <span className="text-[10px] font-black px-2 py-0.5 uppercase border-2 border-black bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+    <span className="text-[10px] font-black px-2 py-0.5 uppercase border-[2px] border-black bg-white text-black">
       {dtype}
     </span>
   );
 };
 
 // ─── Overview metric card ─────────────────────────────────────────
-const OverviewCard = ({ label, value, icon: Icon, accent }) => (
-  <div className={`neo-card p-5 flex items-center gap-4 ${accent}`}>
-    <div className="p-3 border-[3px] border-black bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+const OverviewCard = ({ label, value, icon: Icon }) => (
+  <div className="bg-white border-[2px] border-black shadow-[4px_4px_0px_#000] p-4 flex items-center gap-4 transition-all duration-200 hover:-translate-y-[2px] hover:-translate-x-[2px] hover:shadow-[6px_6px_0px_#000]">
+    <div className="p-3 border-[2px] border-black bg-[#ffe45e]">
       <Icon size={24} className="text-black" strokeWidth={2.5} />
     </div>
     <div>
-      <p className="text-2xl font-black text-black font-mono">{fmt(value)}</p>
-      <p className="text-xs font-bold text-black mt-0.5 uppercase tracking-wider">{label}</p>
+      <p className="text-3xl font-black text-black leading-none mb-1">{fmt(value)}</p>
+      <p className="text-[10px] font-black text-gray-600 uppercase tracking-wider">{label}</p>
     </div>
   </div>
 );
 
 // ─── Stat row inside a column card ───────────────────────────────
-const StatRow = ({ label, value, highlight }) => (
-  <div className={`flex justify-between items-center py-1 ${
-    highlight
-      ? 'text-indigo-700 dark:text-indigo-400 font-semibold'
-      : 'text-gray-600 dark:text-gray-400'
-  }`}>
-    <span className="text-xs">{label}</span>
-    <span className="text-xs font-mono">{fmt(value)}</span>
+const StatRow = ({ label, value, isMeanMedian }) => (
+  <div className={`flex justify-between items-center py-1.5 px-2 ${isMeanMedian ? 'border-l-[4px] border-[#ffe45e]' : ''}`}>
+    <span className="text-[10px] font-black text-gray-600 uppercase tracking-wider">{label}</span>
+    <span className="text-xs font-black text-black text-right">{fmt(value)}</span>
   </div>
 );
 
 // ─── Column Profile Card ──────────────────────────────────────────
-const ColumnCard = ({ col }) => (
-  <div className="neo-card flex flex-col h-full bg-white">
-    {/* Header */}
-    <div className="flex items-center justify-between px-4 py-3 border-b-[3px] border-black bg-[#00f0ff]">
-      <div className="flex items-center gap-2 min-w-0">
-        {col.is_numeric
-          ? <TrendingUp size={16} className="text-black shrink-0" strokeWidth={2.5} />
-          : <Type size={16} className="text-black shrink-0" strokeWidth={2.5} />
-        }
-        <p className="text-sm font-black text-black uppercase tracking-wider truncate" title={col.name}>
-          {col.name}
-        </p>
-      </div>
-      <DtypeBadge dtype={col.dtype} />
-    </div>
-
-    {/* Body */}
-    <div className="px-4 py-3 space-y-0.5">
-      <StatRow label="Unique values" value={col.unique_count} />
-      <StatRow label="Missing"       value={col.missing_count} />
-
-      {col.is_numeric ? (
-        <>
-          <div className="border-t border-dashed border-gray-100 dark:border-gray-700 my-1" />
-          <StatRow label="Mean"   value={col.mean}  highlight />
-          <StatRow label="Std"    value={col.std} />
-          <StatRow label="Min"    value={col.min} />
-          <StatRow label="25%"    value={col.q25} />
-          <StatRow label="Median" value={col.q50}   highlight />
-          <StatRow label="75%"    value={col.q75} />
-          <StatRow label="Max"    value={col.max} />
-        </>
-      ) : (
-        <>
-          <div className="border-t border-dashed border-gray-100 dark:border-gray-700 my-1" />
-          <div className="flex justify-between items-start py-1">
-            <span className="text-xs text-gray-600 dark:text-gray-400">Most frequent</span>
-            <span className="text-xs font-mono text-indigo-700 dark:text-indigo-400 font-semibold max-w-[55%] text-right break-words">
-              {col.top_value ?? '—'}
-            </span>
-          </div>
-          <StatRow label="Frequency" value={col.top_value_frequency} />
-        </>
-      )}
-    </div>
-  </div>
-);
-
-// ─── Health bar ───────────────────────────────────────────────────
-const HealthBar = ({ missing, total }) => {
-  const pct   = total > 0 ? Math.round((missing / total) * 100) : 0;
-  const color = pct === 0 ? 'bg-[#ffe45e]' : pct < 5 ? 'bg-orange-400' : 'bg-[#ff499e]';
+const ColumnCard = ({ col }) => {
+  const hasOutliers = col.outlier_count && col.outlier_count > 0;
+  
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex-1 h-3 bg-white border-[2px] border-black overflow-hidden relative shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-        <div className={`h-full ${color} border-r-[2px] border-black transition-none`} style={{ width: `${Math.min(pct, 100)}%` }} />
+    <div className="bg-white border-[2px] border-black shadow-[4px_4px_0px_#000] flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center justify-between px-3 py-2.5 border-b-[2px] border-black bg-black">
+        <div className="flex items-center gap-2 min-w-0">
+          {col.is_numeric
+            ? <TrendingUp size={16} className="text-white shrink-0" strokeWidth={2.5} />
+            : <Type size={16} className="text-white shrink-0" strokeWidth={2.5} />
+          }
+          <p className="text-[13px] font-black text-white uppercase tracking-wider break-words leading-tight" title={col.name}>
+            {col.name}
+          </p>
+        </div>
+        <DtypeBadge dtype={col.dtype} />
       </div>
-      <span className="text-xs font-black text-black w-10 text-right">{pct}%</span>
+
+      {/* Body */}
+      <div className="p-3 flex flex-col flex-1">
+        <div className="space-y-0.5 mb-4">
+          <StatRow label="Unique Values" value={col.unique_count} />
+          <StatRow label="Missing"       value={col.missing_count} />
+
+          {col.is_numeric ? (
+            <>
+              <StatRow label="Mean"   value={col.mean}  isMeanMedian={true} />
+              <StatRow label="Std"    value={col.std} />
+              <StatRow label="Min"    value={col.min} />
+              <StatRow label="25%"    value={col.q25} />
+              <StatRow label="Median" value={col.q50}   isMeanMedian={true} />
+              <StatRow label="75%"    value={col.q75} />
+              <StatRow label="Max"    value={col.max} />
+            </>
+          ) : (
+            <>
+              <div className="flex justify-between items-start py-1.5 px-2 mt-2">
+                <span className="text-[10px] font-black text-gray-600 uppercase tracking-wider">Most freq</span>
+                <span className="text-xs font-black text-black text-right max-w-[55%] break-words">
+                  {col.top_value ?? '—'}
+                </span>
+              </div>
+              <StatRow label="Frequency" value={col.top_value_frequency} />
+            </>
+          )}
+        </div>
+        
+        {/* Spacer to push badge to bottom */}
+        <div className="mt-auto pt-2 border-t-[2px] border-dashed border-gray-200">
+          {hasOutliers ? (
+            <div className="bg-[#ff499e] border-[2px] border-black text-white text-[10px] font-black uppercase text-center py-1.5 w-full">
+              ⚠ {col.outlier_count} OUTLIERS DETECTED
+            </div>
+          ) : (
+            <div className="bg-[#22c55e] border-[2px] border-black text-white text-[10px] font-black uppercase text-center py-1.5 w-full">
+              ✓ CLEAN
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
 
 // ─── Main DataSummary Component ───────────────────────────────────
 const DataSummary = ({ isDataLoaded }) => {
-  const [summary,   setSummary]   = useState(null);
+  const [summary, setSummary] = useState(null);
+  const [correlation, setCorrelation] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error,     setError]     = useState(null);
-  const [search,    setSearch]    = useState('');
-  const [filter,    setFilter]    = useState('all');
+  const [error, setError] = useState(null);
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     if (!isDataLoaded) {
@@ -132,8 +123,14 @@ const DataSummary = ({ isDataLoaded }) => {
     const fetchSummary = async () => {
       setIsLoading(true);
       try {
-        const data = await getSummary();
-        setSummary(data);
+        const [sumData, corrData] = await Promise.all([
+          getSummary(),
+          getCorrelationMatrix().catch(() => null) // fail gracefully if error
+        ]);
+        setSummary(sumData);
+        if (corrData && corrData.columns) {
+          setCorrelation(corrData);
+        }
       } catch (err) {
         setError(err.response?.data?.error || 'Failed to load data summary.');
       } finally {
@@ -146,11 +143,11 @@ const DataSummary = ({ isDataLoaded }) => {
   if (!isDataLoaded) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-4">
-        <Database size={48} className="text-gray-300 dark:text-gray-600" />
+        <Database size={48} className="text-black opacity-30" strokeWidth={1.5} />
         <div>
-          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">No Data Profile Available</h3>
-          <p className="text-sm text-gray-400 dark:text-gray-500 max-w-xs mx-auto">
-            Please import a dataset from the <strong>File</strong> menu to view its statistical profile.
+          <h3 className="text-lg font-black text-black uppercase">No Data Profile Available</h3>
+          <p className="text-xs font-bold text-gray-500 uppercase mt-2">
+            Please import a dataset from the FILE menu
           </p>
         </div>
       </div>
@@ -159,17 +156,17 @@ const DataSummary = ({ isDataLoaded }) => {
 
   if (isLoading) return (
     <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
-      <Loader size={36} className="text-blue-500 animate-spin" />
-      <p className="text-gray-500 dark:text-gray-400">Profiling your dataset…</p>
+      <Loader size={36} className="text-black animate-spin" strokeWidth={3} />
+      <p className="text-black font-black uppercase text-sm tracking-wider">Profiling your dataset…</p>
     </div>
   );
 
   if (error) return (
-    <div className="max-w-lg mx-auto mt-16 flex items-start gap-3 p-5 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-xl text-red-700 dark:text-red-300">
-      <AlertCircle size={22} className="shrink-0 mt-0.5" />
+    <div className="max-w-lg mx-auto mt-16 p-5 bg-[#ff499e] border-[3px] border-black shadow-[6px_6px_0px_#000] text-white flex gap-4">
+      <AlertCircle size={24} className="shrink-0" strokeWidth={3} />
       <div>
-        <p className="font-semibold">Could not load profile</p>
-        <p className="text-sm mt-1">{error}</p>
+        <p className="font-black uppercase text-lg">Could not load profile</p>
+        <p className="text-sm font-bold mt-1">{error}</p>
       </div>
     </div>
   );
@@ -177,113 +174,194 @@ const DataSummary = ({ isDataLoaded }) => {
   if (!summary) return null;
 
   const { overview, columns } = summary;
-  const totalCells      = overview.total_rows * overview.total_cols;
-  const numericCount    = columns.filter(c =>  c.is_numeric).length;
-  const categoricalCount = columns.filter(c => !c.is_numeric).length;
+  const totalCells = overview.total_rows * overview.total_cols;
+  const missingPercent = totalCells > 0 ? (overview.missing_cells / totalCells) * 100 : 0;
+  const duplicatePercent = overview.total_rows > 0 ? (overview.duplicate_rows / overview.total_rows) * 100 : 0;
+  
+  // Calculate health score: 100 - (missing_percent * 2) - (duplicate_percent * 5) clamped 0-100
+  let healthScore = 100 - (missingPercent * 2) - (duplicatePercent * 5);
+  healthScore = Math.max(0, Math.min(100, Math.round(healthScore)));
+  
+  const getHealthLabel = (score) => {
+    if (score >= 90) return { label: 'EXCELLENT', color: 'text-[#22c55e]' };
+    if (score >= 70) return { label: 'GOOD', color: 'text-[#ffe45e]' };
+    if (score >= 50) return { label: 'FAIR', color: 'text-[#ff8c00]' };
+    return { label: 'NEEDS ATTENTION', color: 'text-[#ff499e]' };
+  };
+  
+  const healthStatus = getHealthLabel(healthScore);
+  const completenessPercent = Math.max(0, 100 - missingPercent).toFixed(1);
+  const uniquenessPercent = Math.max(0, 100 - duplicatePercent).toFixed(1);
 
   const visibleCols = columns
     .filter(c => filter === 'all' || (filter === 'numeric' ? c.is_numeric : !c.is_numeric))
     .filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
 
+  // Correlation Matrix Cell Color
+  const getCorrColor = (val) => {
+    if (val === null || val === undefined) return 'bg-gray-200';
+    if (val === 1.0) return 'bg-[#ffe45e]';
+    if (val >= 0.5) return 'bg-[#fff5ba]';
+    if (val > -0.5) return 'bg-white';
+    if (val > -1.0) return 'bg-[#ffb6db]';
+    return 'bg-[#ff499e]';
+  };
+
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-300">
+    <div className="w-full space-y-12 animate-in fade-in duration-300 pb-20">
 
-      {/* Page Header */}
-      <div className="flex items-center gap-3">
-        <div className="p-2.5 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
-          <FileText size={24} className="text-blue-600 dark:text-blue-400" />
+      {/* SECTION 1 — DATASET OVERVIEW */}
+      <section>
+        <div className="border-b-[2px] border-black pb-2 mb-6">
+          <h2 className="text-xl font-black text-black uppercase tracking-wider">Dataset Overview</h2>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Dataset Profile</h1>
-          <p className="text-sm text-gray-400 dark:text-gray-500">
-            {overview.total_cols} columns · {overview.total_rows.toLocaleString()} rows
-          </p>
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <OverviewCard label="Total Rows"     value={overview.total_rows}     icon={Hash} />
+          <OverviewCard label="Total Columns"  value={overview.total_cols}     icon={FileText} />
+          <OverviewCard label="Missing Cells"  value={overview.missing_cells}  icon={AlertTriangle} />
+          <OverviewCard label="Duplicate Rows" value={overview.duplicate_rows} icon={AlertCircle} />
+          <OverviewCard label="Memory (KB)"    value={overview.memory_kb}      icon={TrendingUp} />
         </div>
-      </div>
+      </section>
 
-      {/* Overview Metric Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
-        <OverviewCard label="Total Rows"     value={overview.total_rows}     icon={Hash}          accent="bg-[#ffe45e]" />
-        <OverviewCard label="Total Columns"  value={overview.total_cols}     icon={FileText}      accent="bg-[#00f0ff]" />
-        <OverviewCard label="Missing Cells"  value={overview.missing_cells}  icon={AlertTriangle} accent={overview.missing_cells  === 0 ? 'bg-[#ffe45e]' : 'bg-[#ff499e]'} />
-        <OverviewCard label="Duplicate Rows" value={overview.duplicate_rows} icon={AlertCircle}   accent={overview.duplicate_rows === 0 ? 'bg-[#ffe45e]' : 'bg-[#ff499e]'} />
-        <OverviewCard label="Memory (KB)"    value={overview.memory_kb}      icon={TrendingUp}    accent="bg-white" />
-      </div>
-
-      {/* Dataset Health */}
-      {/* Dataset Health */}
-      <div className="neo-card p-5 bg-white">
-        <div className="flex items-center justify-between mb-4 border-b-[3px] border-black pb-3">
-          <h2 className="font-black text-black uppercase tracking-tight text-xl">Dataset Health</h2>
-          <div className="flex gap-4 text-xs font-bold text-black uppercase">
-            <span className="flex items-center gap-1"><span className="w-3 h-3 border-2 border-black bg-blue-400 inline-block" /> {numericCount} numeric</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 border-2 border-black bg-green-400 inline-block" /> {categoricalCount} categorical</span>
-          </div>
-        </div>
-        <div className="space-y-3">
-          <div>
-            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
-              <span>Data Completeness</span>
-              <span>{overview.missing_cells === 0 ? '100% — No missing values' : `${overview.missing_cells} missing of ${totalCells.toLocaleString()} cells`}</span>
+      {/* SECTION 2 — DATA HEALTH SCORE */}
+      <section>
+        <div className="bg-white border-[3px] border-black shadow-[6px_6px_0px_#000] w-full flex flex-col md:flex-row">
+          {/* Left Side: Score */}
+          <div className="p-8 md:w-1/3 border-b-[3px] md:border-b-0 md:border-r-[3px] border-black flex flex-col items-center justify-center bg-[#111] text-white">
+            <h3 className="text-sm font-black uppercase tracking-widest text-gray-300 mb-2">Data Health Score</h3>
+            <div className="text-7xl font-black leading-none mb-2">{healthScore}</div>
+            <div className={`text-xl font-black uppercase ${healthStatus.color} drop-shadow-md`}>
+              {healthStatus.label}
             </div>
-            <HealthBar missing={overview.missing_cells} total={totalCells} />
           </div>
-          <div>
-            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
-              <span>Row Uniqueness</span>
-              <span>{overview.duplicate_rows === 0 ? '100% unique rows' : `${overview.duplicate_rows} duplicate rows`}</span>
+          
+          {/* Right Side: Progress Bars */}
+          <div className="p-8 md:w-2/3 flex flex-col justify-center gap-8 bg-[#fef9ef]">
+            {/* Completeness Bar */}
+            <div>
+              <div className="flex justify-between items-end mb-2">
+                <span className="font-black text-black uppercase text-sm">Data Completeness</span>
+                <span className="font-bold text-gray-600 text-xs uppercase">{completenessPercent}% — {overview.missing_cells.toLocaleString()} missing values</span>
+              </div>
+              <div className="h-4 w-full border-[2px] border-black bg-white">
+                <div 
+                  className="h-full bg-[#ffe45e] border-r-[2px] border-black" 
+                  style={{ width: `${completenessPercent}%` }} 
+                />
+              </div>
             </div>
-            <HealthBar missing={overview.duplicate_rows} total={overview.total_rows} />
+            
+            {/* Uniqueness Bar */}
+            <div>
+              <div className="flex justify-between items-end mb-2">
+                <span className="font-black text-black uppercase text-sm">Row Uniqueness</span>
+                <span className="font-bold text-gray-600 text-xs uppercase">{uniquenessPercent}% — {overview.duplicate_rows.toLocaleString()} duplicate rows</span>
+              </div>
+              <div className="h-4 w-full border-[2px] border-black bg-white">
+                <div 
+                  className="h-full bg-[#00f0ff] border-r-[2px] border-black" 
+                  style={{ width: `${uniquenessPercent}%` }} 
+                />
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Column Grid */}
-      <div>
-        {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-          <h2 className="font-semibold text-gray-800 dark:text-gray-100">
-            Column Profiles
-            <span className="ml-2 text-xs font-normal text-gray-400 dark:text-gray-500">({visibleCols.length} of {columns.length})</span>
+      {/* SECTION 3 — COLUMN PROFILES */}
+      <section>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-[2px] border-black pb-4 mb-6">
+          <h2 className="text-xl font-black text-black uppercase tracking-wider">
+            Column Profiles <span className="text-gray-500 text-sm ml-2">({visibleCols.length} OF {columns.length})</span>
           </h2>
-          <div className="flex items-center gap-2">
-            {/* Type filter toggle */}
-            <div className="flex text-xs border-[3px] border-black font-black uppercase">
-              {['all', 'numeric', 'categorical'].map(f => (
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Filter Tabs */}
+            <div className="flex border-[2px] border-black text-xs font-black uppercase bg-white">
+              {['all', 'numeric', 'categorical'].map((f) => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`px-3 py-1.5 cursor-pointer transition-none border-r-[3px] border-black last:border-r-0 ${
-                    filter === f
-                      ? 'bg-black text-[#ffe45e]'
-                      : 'bg-white text-black hover:bg-cyan-300'
+                  className={`px-4 py-2 border-r-[2px] border-black last:border-r-0 hover:bg-gray-100 transition-colors ${
+                    filter === f ? 'bg-black text-white hover:bg-black' : ''
                   }`}
                 >
                   {f}
                 </button>
               ))}
             </div>
+            {/* Search Input */}
             <input
               type="text"
-              placeholder="Search columns…"
+              placeholder="SEARCH COLUMNS..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="neo-input px-3 py-1.5 w-44 uppercase placeholder:text-gray-400"
+              className="px-3 py-2 border-[2px] border-black bg-[#fef9ef] text-black font-bold uppercase placeholder:text-gray-500 placeholder:font-black focus:outline-none focus:bg-white w-48 sm:w-64"
             />
           </div>
         </div>
 
         {visibleCols.length === 0 ? (
-          <div className="text-center py-16 text-gray-400 dark:text-gray-600">
-            <FileText size={32} className="mx-auto mb-2 opacity-30" />
-            <p className="text-sm">No columns match your filter.</p>
+          <div className="bg-white border-[2px] border-black p-12 text-center shadow-[4px_4px_0px_#000]">
+            <p className="text-xl font-black uppercase text-black">No columns match filter</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             {visibleCols.map(col => <ColumnCard key={col.name} col={col} />)}
           </div>
         )}
-      </div>
+      </section>
+
+      {/* SECTION 4 — CORRELATION HEATMAP */}
+      <section>
+        <div className="border-b-[2px] border-black pb-2 mb-6">
+          <h2 className="text-xl font-black text-black uppercase tracking-wider">Correlation Matrix</h2>
+        </div>
+        
+        {(!correlation || correlation.columns.length < 2) ? (
+          <div className="bg-white border-[2px] border-black p-8 shadow-[4px_4px_0px_#000] inline-block">
+            <p className="font-black text-black uppercase text-sm">Need at least 2 numeric columns to generate correlation matrix</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto pb-4">
+            <div className="inline-block border-[2px] border-black shadow-[4px_4px_0px_#000] bg-white">
+              <table className="border-collapse">
+                <thead>
+                  <tr>
+                    <th className="p-3 bg-black border-[2px] border-black"></th>
+                    {correlation.columns.map((col, idx) => (
+                      <th key={idx} className="p-2 bg-black text-white border-[2px] border-black text-[10px] font-black uppercase whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px]" title={col}>
+                        {col.length > 8 ? col.substring(0, 8) + '…' : col}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {correlation.matrix.map((row, rIdx) => (
+                    <tr key={rIdx}>
+                      <th className="p-2 bg-black text-white border-[2px] border-black text-[10px] font-black uppercase whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px] text-right" title={correlation.columns[rIdx]}>
+                        {correlation.columns[rIdx].length > 8 ? correlation.columns[rIdx].substring(0, 8) + '…' : correlation.columns[rIdx]}
+                      </th>
+                      {row.map((val, cIdx) => {
+                        const isDiagonal = rIdx === cIdx;
+                        return (
+                          <td 
+                            key={cIdx} 
+                            className={`p-3 border-[2px] border-black text-center text-[11px] font-black w-14 h-14 ${isDiagonal ? 'bg-black text-white' : getCorrColor(val)}`}
+                          >
+                            {isDiagonal ? '1.00' : (val !== null ? val.toFixed(2) : '—')}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </section>
+
     </div>
   );
 };

@@ -1,203 +1,211 @@
-import React, { useState, useRef, useEffect } from 'react';
-import GridLayout from 'react-grid-layout';
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
+import React, { useState, useEffect } from 'react';
+import { Trash2, Save } from 'lucide-react';
+import DashboardToolbox from './DashboardToolbox';
+import DashboardProperties from './DashboardProperties';
+import CanvasWidgetWrapper from './widgets/CanvasWidgetWrapper';
+import HeadingWidget from './widgets/HeadingWidget';
+import MetricWidget from './widgets/MetricWidget';
+import ChartWidget from './widgets/ChartWidget';
+import { getFeaturesInfo } from '../../api/client';
 
-import RightSidebar from './RightSidebar';
-import MetricCard from '../widgets/MetricCard';
-import ChartCard from '../widgets/ChartCard';
-import HeadingCard from '../widgets/HeadingCard';
+const DashboardCanvas = ({ isDataLoaded }) => {
+  const [widgets, setWidgets] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
+  const [columns, setColumns] = useState([]);
 
-/* ─── Custom WidthProvider via ResizeObserver ─────────────────────────
-   Bypasses broken ESM named-exports from react-grid-layout.           */
-const useContainerWidth = (ref) => {
-  const [width, setWidth] = useState(800);
   useEffect(() => {
-    if (!ref.current) return;
-    const ro = new ResizeObserver(entries => {
-      for (const e of entries) setWidth(e.contentRect.width);
-    });
-    ro.observe(ref.current);
-    setWidth(ref.current.getBoundingClientRect().width);
-    return () => ro.disconnect();
-  }, [ref]);
-  return width;
-};
+    if (isDataLoaded) fetchCols();
+  }, [isDataLoaded]);
 
-/* ─── Default sizes per widget type ──────────────────────────────── */
-const DEFAULT_SIZES = {
-  metric:  { w: 3,  h: 2,  minW: 2, minH: 1 },
-  chart:   { w: 6,  h: 4,  minW: 4, minH: 3 },
-  heading: { w: 12, h: 1,  minW: 3, minH: 1 },
-};
-
-/* ─── Default settings seeded on drop ──────────────────────────── */
-const DEFAULT_WIDGET_SETTINGS = {
-  heading: {
-    text: 'New Heading', fontSize: 'text-3xl', fontWeight: 'font-bold',
-    textAlign: 'text-left', textDecoration: 'no-underline',
-    fontStyle: 'not-italic', color: '#111827', fontFamily: 'font-sans',
-    backgroundColor: 'transparent',
-  },
-  metric: {
-    column: '', metricType: 'mean',
-    fontSize: 'text-4xl', fontWeight: 'font-bold',
-    textAlign: 'text-center', textDecoration: 'no-underline',
-    fontStyle: 'not-italic', color: '', fontFamily: 'font-sans',
-    backgroundColor: 'transparent',
-  },
-};
-
-const DashboardCanvas = ({ cards, setCards, layout, setLayout, anomalyReport }) => {
-  const canvasRef = useRef(null);
-  const gridWidth = useContainerWidth(canvasRef);
-
-  /* ── Contextual Inspector State ───────────────────────────────── */
-  const [selectedWidgetId, setSelectedWidgetId] = useState(null);
-  const [widgetData, setWidgetData]             = useState({}); // { id → { chartImage?, metricData?, text? } }
-
-  /* ── Widget Data Updaters ────────────────────────────────────── */
-  const handleUpdateChart          = (id, image)    => setWidgetData(p => ({ ...p, [id]: { ...p[id], chartImage: image  } }));
-  const handleUpdateMetric         = (id, data)     => setWidgetData(p => ({ ...p, [id]: { ...p[id], metricData: data   } }));
-  const handleUpdateMetricSettings = (id, settings) => setWidgetData(p => ({ ...p, [id]: { ...p[id], settings           } }));
-  const handleUpdateHeading        = (id, settings) => setWidgetData(p => ({ ...p, [id]: { ...p[id], settings           } }));
-
-  /* ── Grid Handlers ───────────────────────────────────────────── */
-  const onLayoutChange = newLayout => setLayout(newLayout);
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const type = e.dataTransfer.getData('widgetType');
-    if (!type) return;
-
-    const rect  = canvasRef.current.getBoundingClientRect();
-    const colW  = rect.width / 12;
-    const rowH  = 30;
-    const newX  = Math.max(0, Math.min(11, Math.floor((e.clientX - rect.left - 32) / colW)));
-    const newY  = Math.max(0, Math.floor((e.clientY - rect.top  - 32) / rowH));
-
-    const id = `widget-${Date.now()}`;
-    const { w, h, minW = 2, minH = 1 } = DEFAULT_SIZES[type] ?? { w: 4, h: 4, minW: 2, minH: 1 };
-
-    setLayout(prev => [...prev, { i: id, x: newX, y: newY, w, h, minW, minH }]);
-    setCards(prev  => [...prev, { id, type }]);
-    // Seed default typography settings immediately so the card renders correctly before the user opens Properties
-    if (DEFAULT_WIDGET_SETTINGS[type]) {
-      setWidgetData(prev => ({ ...prev, [id]: { settings: { ...DEFAULT_WIDGET_SETTINGS[type] } } }));
+  const fetchCols = async () => {
+    try {
+      const data = await getFeaturesInfo();
+      setColumns(data.columns || []);
+    } catch (e) {
+      console.error(e);
     }
   };
 
-  const handleDragOver = e => e.preventDefault();
+  const addWidget = (type) => {
+    let width, height;
+    let config = {};
 
-  const handleRemoveCard = (id) => {
-    setLayout(prev => prev.filter(i => i.i !== id));
-    setCards(prev  => prev.filter(c => c.id !== id));
-    setWidgetData(prev => { const n = { ...prev }; delete n[id]; return n; });
-    if (selectedWidgetId === id) setSelectedWidgetId(null);
+    if (type === 'heading') {
+      width = 400; height = 80;
+      config = { text: 'DASHBOARD TITLE', size: 'LARGE', align: 'LEFT' };
+    } else if (type === 'metric') {
+      width = 220; height = 140;
+      config = { column: '', aggregation: 'SUM', label: '', color: '#ffe45e' };
+    } else if (type === 'chart') {
+      width = 450; height = 320;
+      config = { chart_type: 'BAR', x_column: '', y_column: '', aggregation: 'MEAN', title: '', theme: 'BRUTAL', showLegend: true, showGrid: true };
+    }
+
+    // Stack them vaguely in the center by default, offset slightly based on existing widgets to prevent exact overlap
+    const offset = (widgets.length % 5) * 24;
+    
+    const newWidget = {
+      id: Date.now(),
+      type,
+      x: 100 + offset,
+      y: 100 + offset,
+      width,
+      height,
+      config
+    };
+
+    setWidgets([...widgets, newWidget]);
+    setSelectedId(newWidget.id);
   };
 
-  const handleCanvasClick = () => setSelectedWidgetId(null);
+  const updateWidget = (id, updates) => {
+    setWidgets(widgets.map(w => w.id === id ? { ...w, ...updates } : w));
+  };
 
-  /* ── Render Widgets ──────────────────────────────────────────── */
-  const renderCard = (card) => {
-    const data       = widgetData[card.id] || {};
-    const isSelected = selectedWidgetId === card.id;
-    const onClick    = (e) => { e.stopPropagation(); setSelectedWidgetId(card.id); };
+  const removeWidget = (id) => {
+    setWidgets(widgets.filter(w => w.id !== id));
+    if (selectedId === id) setSelectedId(null);
+  };
 
-    switch (card.type) {
-      case 'metric':  return <MetricCard  id={card.id} metricData={data.metricData}   settings={data.settings ?? null} isSelected={isSelected} onClick={onClick} />;
-      case 'chart':   return <ChartCard   id={card.id} chartImage={data.chartImage}    isSelected={isSelected} onClick={onClick} />;
-      case 'heading': return <HeadingCard id={card.id} settings={data.settings ?? null} isSelected={isSelected} onClick={onClick} />;
-      default:        return <div>Unknown Widget</div>;
+  const clearCanvas = () => {
+    if (window.confirm("Are you sure you want to clear the canvas?")) {
+      setWidgets([]);
+      setSelectedId(null);
     }
   };
+
+  const autoGenerateDashboard = (template, title, metricConfigs, chartConfigs) => {
+    // Basic auto-arrange logic
+    const newWidgets = [];
+    let currentY = 48;
+
+    // 1. Heading
+    if (title) {
+      newWidgets.push({
+        id: Date.now() + 1, type: 'heading',
+        x: 48, y: currentY, width: 800, height: 80,
+        config: { text: title, size: 'HUGE', align: 'LEFT' }
+      });
+      currentY += 104;
+    }
+
+    // 2. Metrics (Horizontal row)
+    const metricCount = template === 'DEEP_DIVE' ? 4 : (template === 'COMPARISON' ? 0 : 2);
+    for (let i = 0; i < metricCount; i++) {
+      newWidgets.push({
+        id: Date.now() + 10 + i, type: 'metric',
+        x: 48 + (i * 240), y: currentY, width: 220, height: 140,
+        config: { 
+          column: metricConfigs[i]?.col || '', 
+          aggregation: metricConfigs[i]?.agg || 'SUM', 
+          color: ['#ffe45e', '#00f0ff', '#ff499e', '#ff8c00'][i%4] 
+        }
+      });
+    }
+    if (metricCount > 0) currentY += 164;
+
+    // 3. Charts
+    let chartCount = 2;
+    if (template === 'COMPARISON') chartCount = 4;
+
+    for (let i = 0; i < chartCount; i++) {
+      const isSecondRow = i >= 2;
+      newWidgets.push({
+        id: Date.now() + 100 + i, type: 'chart',
+        x: 48 + ((i % 2) * 480), y: currentY + (isSecondRow ? 344 : 0), width: 450, height: 320,
+        config: { 
+          chart_type: chartConfigs[i]?.type || 'BAR', 
+          x_column: chartConfigs[i]?.x || '', 
+          y_column: chartConfigs[i]?.y || '', 
+          aggregation: 'MEAN', 
+          theme: ['BRUTAL', 'NEON', 'WARM', 'MONO'][i%4] 
+        }
+      });
+    }
+
+    setWidgets(newWidgets);
+    setSelectedId(null);
+  };
+
+  const selectedWidget = widgets.find(w => w.id === selectedId);
 
   return (
-    <div className="flex h-full w-full absolute inset-0">
+    <div className="flex w-full h-[calc(100vh-160px)]">
+      
+      {/* LEFT: TOOLBOX */}
+      <DashboardToolbox 
+        addWidget={addWidget} 
+        autoGenerateDashboard={autoGenerateDashboard} 
+        columns={columns} 
+      />
 
-      {/* ── Canvas Area ─────────────────────────────────────────── */}
-      <div
-        ref={canvasRef}
-        id="grid-container"
-        className="flex-1 min-w-0 overflow-y-auto relative"
-        style={{
-          backgroundColor: 'var(--canvas-bg, #f1f5f9)',
-          backgroundImage: 'radial-gradient(circle, var(--dot-color, #cbd5e1) 1px, transparent 1px)',
-          backgroundSize: '28px 28px',
-        }}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onClick={handleCanvasClick}
-      >
-        {/* Empty state hint */}
-        {cards.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-            <div className="text-center neo-card bg-[#00f0ff] px-10 py-8">
-              <div className="text-5xl mb-3">📊</div>
-              <h2 className="text-xl font-black text-black uppercase tracking-tight">Your canvas is empty</h2>
-              <p className="text-sm font-bold text-black mt-1 uppercase">Drag a widget from the Toolbox on the right to get started</p>
-            </div>
+      {/* MIDDLE: CANVAS */}
+      <div className="flex-1 flex flex-col min-w-0 bg-[#fef9ef] relative">
+        
+        {/* Canvas Toolbar */}
+        <div className="h-[48px] bg-[#fef9ef] border-b-[2px] border-black flex items-center justify-between px-4 shrink-0 z-20">
+          <div className="flex gap-2">
+            <button 
+              onClick={clearCanvas}
+              className="px-3 py-1.5 border-[2px] border-black bg-white hover:bg-[#ff499e] hover:text-white transition-colors flex items-center gap-2 font-black uppercase text-xs"
+            >
+              <Trash2 size={14} /> Clear Canvas
+            </button>
+            <button 
+              className="px-3 py-1.5 border-[2px] border-black bg-[#ffe45e] hover:bg-yellow-500 transition-colors flex items-center gap-2 font-black uppercase text-xs"
+              onClick={() => alert("Dashboard saved to workspace (simulated)")}
+            >
+              <Save size={14} /> Save Layout
+            </button>
           </div>
-        )}
-
-        {/* Grid */}
-        <div className="p-6 min-h-[800px]">
-          <GridLayout
-            className="layout"
-            layout={layout}
-            cols={12}
-            width={gridWidth - 48} /* account for p-6 (24px × 2) */
-            onLayoutChange={onLayoutChange}
-            isDraggable={true}
-            isResizable={true}
-            margin={[12, 12]}
-            containerPadding={[0, 0]}
-            draggableHandle=".drag-handle"
-          >
-            {layout.map(item => {
-              const card = cards.find(c => c.id === item.i);
-              if (!card) return null;
-              return (
-                <div
-                  key={item.i}
-                  className="flex flex-col neo-card bg-white p-0 overflow-hidden"
-                >
-                  {/* Drag Handle */}
-                  <div className="drag-handle w-full h-4 bg-[#ffe45e] border-b-[3px] border-black hover:bg-yellow-400 cursor-grab active:cursor-grabbing transition-none shrink-0 flex items-center justify-center">
-                    <div className="w-8 h-1 bg-black" />
-                  </div>
-
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleRemoveCard(item.i); }}
-                    className="absolute top-0 right-0 z-20 text-xs font-black text-black bg-[#ff499e] border-l-[3px] border-b-[3px] border-black hover:bg-red-500 transition-none cursor-pointer leading-none py-1 px-1.5"
-                    title="Remove widget"
-                  >✕</button>
-
-                  {/* Widget content */}
-                  <div className="flex-1 overflow-hidden">
-                    {renderCard(card)}
-                  </div>
-                </div>
-              );
-            })}
-          </GridLayout>
+          <div className="font-black text-[10px] uppercase bg-black text-white px-2 py-1">
+            {widgets.length} WIDGETS
+          </div>
         </div>
+
+        {/* Canvas Area with Dot Grid */}
+        <div 
+          className="flex-1 overflow-auto relative"
+          onClick={() => setSelectedId(null)}
+          style={{
+            backgroundImage: 'radial-gradient(#00000015 2px, transparent 2px)',
+            backgroundSize: '24px 24px'
+          }}
+        >
+          {!isDataLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <span className="font-black text-2xl uppercase opacity-20 text-black">NO DATA LOADED</span>
+            </div>
+          )}
+          
+          <div className="relative min-w-[1200px] min-h-[1200px]">
+            {widgets.map(widget => (
+              <CanvasWidgetWrapper
+                key={widget.id}
+                widget={widget}
+                updateWidget={updateWidget}
+                removeWidget={removeWidget}
+                selectWidget={setSelectedId}
+                isSelected={selectedId === widget.id}
+              >
+                {widget.type === 'heading' && <HeadingWidget widget={widget} updateWidget={updateWidget} />}
+                {widget.type === 'metric' && <MetricWidget widget={widget} />}
+                {widget.type === 'chart' && <ChartWidget widget={widget} />}
+              </CanvasWidgetWrapper>
+            ))}
+          </div>
+        </div>
+
       </div>
 
-      {/* ── Right Sidebar — fixed w-80 ───────────────────────────── */}
-      <div className="w-80 shrink-0">
-        <RightSidebar
-          selectedWidgetId={selectedWidgetId}
-          setSelectedWidgetId={setSelectedWidgetId}
-          cards={cards}
-          widgetData={widgetData}
-          anomalyReport={anomalyReport}
-          onUpdateChart={handleUpdateChart}
-          onUpdateMetric={handleUpdateMetric}
-          onUpdateMetricSettings={handleUpdateMetricSettings}
-          onUpdateHeading={handleUpdateHeading}
-        />
-      </div>
+      {/* RIGHT: PROPERTIES */}
+      <DashboardProperties 
+        selectedWidget={selectedWidget} 
+        updateWidget={updateWidget} 
+        deselectWidget={() => setSelectedId(null)}
+        columns={columns}
+      />
+
     </div>
   );
 };

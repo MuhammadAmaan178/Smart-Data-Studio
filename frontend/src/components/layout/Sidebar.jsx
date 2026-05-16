@@ -1,12 +1,13 @@
 import React from 'react';
 import {
   Database, FileText, LayoutDashboard, BrainCircuit, Network,
-  ChevronRight, ChevronLeft
+  ChevronRight, ChevronLeft, Wand2
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { id: 'data-prep',    label: 'Data Prep & Cleaning',  icon: Database        },
   { id: 'data-summary', label: 'Data Summary',           icon: FileText        },
+  { id: 'feature-engineering', label: 'Feature Engineering', icon: Wand2       },
   { id: 'dashboard',    label: 'Interactive Dashboard',  icon: LayoutDashboard },
   { id: 'ml-studio',    label: 'ML Studio',              icon: BrainCircuit    },
   { id: 'dl-studio',    label: 'Deep Learning Studio',   icon: Network         },
@@ -18,7 +19,7 @@ const Sidebar = ({ currentView, setCurrentView, isOpen, toggleSidebar }) => {
       className={`h-full flex flex-col shrink-0
                   bg-[#ffe45e] border-r-[3px] border-black
                   transition-none
-                  ${isOpen ? 'w-64' : 'w-16'}`}
+                  ${isOpen ? 'w-[280px]' : 'w-16'}`}
     >
       {/* Toggle button */}
       <div className={`flex items-center h-12 px-3 border-b-[3px] border-black
@@ -46,17 +47,17 @@ const Sidebar = ({ currentView, setCurrentView, isOpen, toggleSidebar }) => {
                           border-[3px] border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]
                           transition-none cursor-pointer text-left
                           ${isActive
-                            ? 'bg-black text-[#ffe45e] shadow-none translate-x-[3px] translate-y-[3px]'
+                            ? 'bg-[#ffe45e] text-black shadow-none translate-x-[3px] translate-y-[3px] font-black'
                             : `bg-white text-black hover:bg-cyan-300`
                           }`}
             >
               <Icon size={20} strokeWidth={2.5} className="shrink-0" />
 
               {/* Animated label */}
-              <span
+                  <span
                 className={`text-xs font-medium whitespace-nowrap overflow-hidden
                             transition-all duration-300 ease-in-out
-                            ${isOpen ? 'opacity-100 w-auto max-w-[160px]' : 'opacity-0 w-0 max-w-0'}`}
+                            ${isOpen ? 'opacity-100 w-auto max-w-full' : 'opacity-0 w-0 max-w-0'}`}
               >
                 {label}
               </span>

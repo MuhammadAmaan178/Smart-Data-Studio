@@ -60,6 +60,7 @@ def get_possible_dtypes(series):
 
 def generate_anomaly_report(df):
     report = {
+        "total_rows": len(df),
         "total_duplicates": int(df.duplicated().sum()),
         "columns": {}
     }

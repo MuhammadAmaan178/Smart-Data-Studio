@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState, useRef, useEffect, createContext } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
+import PipelineHeader from './PipelineHeader';
 
 const AppLayout = ({
   currentView, setCurrentView, children,
-  theme, setTheme,
   sidebarOpen, setSidebarOpen,
   onOpenDemoModal,
   onFileUpload,
@@ -15,7 +15,6 @@ const AppLayout = ({
 }) => {
   const isDashboard = currentView === 'dashboard';
 
-  const toggleTheme   = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
   const toggleSidebar = () => setSidebarOpen(o => !o);
 
   return (
@@ -27,8 +26,6 @@ const AppLayout = ({
       {/* IDE Header */}
       <div>
         <Header
-          theme={theme}
-          toggleTheme={toggleTheme}
           sidebarOpen={sidebarOpen}
           toggleSidebar={toggleSidebar}
           onOpenDemoModal={onOpenDemoModal}
@@ -55,11 +52,14 @@ const AppLayout = ({
 
         {/* Main canvas */}
         <main 
-          className={`flex-1 min-w-0 transition-none
-                      bg-[#ffffff] border-l-[3px] border-black
-                      ${isDashboard ? 'overflow-hidden relative' : 'overflow-y-auto p-8'}`}
+          className={`flex-1 min-w-0 transition-none flex flex-col
+                      bg-[#ffffff] border-l-[3px] border-black`}
         >
-          {children}
+          <PipelineHeader currentView={currentView} />
+          
+          <div id="main-scroll-container" className={`flex-1 min-h-0 relative ${isDashboard ? 'overflow-hidden' : 'overflow-y-auto p-8'}`}>
+            {children}
+          </div>
         </main>
       </div>
 

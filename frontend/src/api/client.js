@@ -46,3 +46,109 @@ export const loadDemo = async (datasetName) => {
   return res.data;
 };
 
+export const getMissingInfo = async () => {
+  const res = await axios.post(`${API_BASE}/missing-info`);
+  return res.data;
+};
+
+export const handleMissing = async (payload) => {
+  const res = await axios.post(`${API_BASE}/handle-missing`, payload);
+  return res.data;
+};
+
+export const stringClean = async (payload) => {
+  const res = await axios.post(`${API_BASE}/string-clean`, payload);
+  return res.data;
+};
+
+export const outlierDetect = async (payload) => {
+  const res = await axios.post(`${API_BASE}/outlier-detect`, payload);
+  return res.data;
+};
+
+export const outlierHandle = async (payload) => {
+  const res = await axios.post(`${API_BASE}/outlier-handle`, payload);
+  return res.data;
+};
+
+export const getCleanReport = async () => {
+  const res = await axios.post(`${API_BASE}/clean-report`);
+  return res.data;
+};
+
+export const clearCleanLog = async () => {
+  const res = await axios.post(`${API_BASE}/clear-clean-log`);
+  return res.data;
+};
+
+export const getFullDataset = async () => {
+  const res = await axios.get(`${API_BASE}/export`);
+  return res.data;
+};
+
+export const getCorrelationMatrix = async () => {
+  const res = await axios.post(`${API_BASE}/correlation`);
+  return res.data;
+};
+
+// ── Feature Engineering ──
+export const getFeaturesInfo = async () => {
+  const res = await axios.post(`${API_BASE}/features/info`);
+  return res.data;
+};
+
+export const createFeatureColumn = async (payload) => {
+  const res = await axios.post(`${API_BASE}/features/create-column`, payload);
+  return res.data;
+};
+
+export const renameFeatureColumn = async (payload) => {
+  const res = await axios.post(`${API_BASE}/features/rename-column`, payload);
+  return res.data;
+};
+
+export const dropFeatureColumn = async (payload) => {
+  const res = await axios.post(`${API_BASE}/features/drop-column`, payload);
+  return res.data;
+};
+
+export const binFeatureColumn = async (payload) => {
+  const res = await axios.post(`${API_BASE}/features/bin-column`, payload);
+  return res.data;
+};
+
+export const extractDateFeature = async (payload) => {
+  const res = await axios.post(`${API_BASE}/features/extract-date`, payload);
+  return res.data;
+};
+
+export const encodeFeatureColumn = async (payload) => {
+  const res = await axios.post(`${API_BASE}/features/encode-column`, payload);
+  return res.data;
+};
+
+export const scaleFeatureColumn = async (payload) => {
+  const res = await axios.post(`${API_BASE}/features/scale-column`, payload);
+  return res.data;
+};
+
+export const stringOpsFeature = async (payload) => {
+  const res = await axios.post(`${API_BASE}/features/string-ops`, payload);
+  return res.data;
+};
+
+export const previewFeatures = async () => {
+  const res = await axios.post(`${API_BASE}/features/preview`);
+  return res.data;
+};
+
+// ── Dashboard ──
+export const getDashboardMetrics = async (payload) => {
+  const res = await axios.post(`${API_BASE}/dashboard/metrics`, payload);
+  return res.data;
+};
+
+export const getChartData = async (payload) => {
+  const res = await axios.post(`${API_BASE}/dashboard/chart-data`, payload);
+  return res.data;
+};
