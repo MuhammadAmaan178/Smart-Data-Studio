@@ -13,6 +13,35 @@ body {
   color: #000000;
 }
 
+/* ── Global Neobrutalism Scrollbars ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #000000 #fef9ef;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #fef9ef;
+  border-left: 1px solid black;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #000000;
+  border: none;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #333333;
+}
+
+*::-webkit-scrollbar-corner {
+  background: #fef9ef;
+}
+
 /* Canvas dot-grid adapts to dark mode via CSS custom properties */
 :root {
   --canvas-bg:   #ffffff;

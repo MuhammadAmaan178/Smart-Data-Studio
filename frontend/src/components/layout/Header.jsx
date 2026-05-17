@@ -34,8 +34,11 @@ const DropdownMenu = ({ label, items }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-54 z-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
-                        border-[3px] overflow-hidden bg-white border-black">
+        <div 
+          style={{ zIndex: 99999 }}
+          className="absolute top-full left-0 mt-2 w-54 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                        border-[3px] overflow-hidden bg-white border-black"
+        >
           {items.map((item, i) =>
             item === 'divider'
               ? <div key={i} className="border-t border-gray-100 dark:border-gray-700 my-1" />
@@ -140,7 +143,7 @@ const Header = ({
   ];
 
   return (
-    <header className="shrink-0 flex flex-col bg-[#fff8e7] border-b-[3px] border-black transition-none z-50">
+    <header className="shrink-0 flex flex-col bg-[#fff8e7] border-b-[3px] border-black transition-none z-40">
 
       {/* ── Top Row ─────────────────────────────────────────── */}
       <div className="flex items-center justify-between h-14 px-4 border-b-[3px] border-black">

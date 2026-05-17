@@ -58,7 +58,7 @@ const MetricWidget = ({ widget }) => {
         {error ? (
           <h3 className="text-xl font-black text-[#ff499e] uppercase">{error}</h3>
         ) : (
-          <h3 className="text-4xl md:text-5xl font-black text-black truncate" title={formatNumber(data)}>
+          <h3 className="font-black text-black truncate leading-none" title={formatNumber(data)} style={{ fontSize: widget.config.valueFontSize || '48px' }}>
             {formatNumber(data)}
           </h3>
         )}

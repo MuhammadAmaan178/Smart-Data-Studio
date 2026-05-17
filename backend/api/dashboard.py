@@ -108,17 +108,12 @@ def get_chart_data():
             for k, v in grouped.items():
                 result_data.append({x_col: safe_cast(k), y_col: safe_cast(v)})
                 
-        elif chart_type in ['SCATTER', 'BUBBLE']:
-            if not y_col or y_col not in df.columns:
-                return jsonify({"error": "Valid Y column required for this chart type"}), 400
-                
-            # Sample max 500 rows to prevent rendering lag
-            sample_df = df[[x_col, y_col]].dropna()
-            if len(sample_df) > 500:
-                sample_df = sample_df.sample(500, random_state=42)
-                
-            for _, row in sample_df.iterrows():
-                result_data.append({x_col: safe_cast(row[x_col]), y_col: safe_cast(row[y_col])})
+        elif chart_type == 'SCATTER':
+            sample = df[[x_col, y_col]].dropna().head(500)
+            return jsonify({
+              'data': sample.rename(columns={x_col:'x', y_col:'y'}).to_dict('records'),
+              'x_key': 'x', 'y_key': 'y'
+            })
                 
         elif chart_type == 'PIE':
             # Value counts of X
@@ -137,26 +132,7 @@ def get_chart_data():
                     result_data.append({x_col: bin_label, "count": safe_cast(counts[i])})
             y_col = "count"
             
-        elif chart_type in ['VIOLIN', 'BOXPLOT']:
-            # For simplicity, returning a grouped aggregation structure that can be plotted as a range
-            # Recharts doesn't have native boxplot, so we send stats to render custom shapes
-            if not y_col or y_col not in df.columns:
-                return jsonify({"error": "Valid Y column required for this chart type"}), 400
-                
-            grouped = df.groupby(x_col)[y_col]
-            for name, group in grouped:
-                group_clean = pd.to_numeric(group, errors='coerce').dropna()
-                if len(group_clean) == 0: continue
-                
-                result_data.append({
-                    x_col: safe_cast(name),
-                    "min": safe_cast(group_clean.min()),
-                    "q1": safe_cast(group_clean.quantile(0.25)),
-                    "median": safe_cast(group_clean.median()),
-                    "q3": safe_cast(group_clean.quantile(0.75)),
-                    "max": safe_cast(group_clean.max()),
-                    "mean": safe_cast(group_clean.mean())
-                })
+
         else:
             return jsonify({"error": "Unsupported chart type"}), 400
 

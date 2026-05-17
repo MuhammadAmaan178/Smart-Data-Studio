@@ -14,6 +14,9 @@ const AppLayout = ({
   onSaveWorkspace, onLoadWorkspace
 }) => {
   const isDashboard = currentView === 'dashboard';
+  const isMlStudio = currentView === 'ml-studio';
+  const isDlStudio = currentView === 'dl-studio';
+  const isDataPrep = currentView === 'data-prep';
 
   const toggleSidebar = () => setSidebarOpen(o => !o);
 
@@ -57,7 +60,18 @@ const AppLayout = ({
         >
           <PipelineHeader currentView={currentView} />
           
-          <div id="main-scroll-container" className={`flex-1 min-h-0 relative ${isDashboard ? 'overflow-hidden' : 'overflow-y-auto p-8'}`}>
+          <div
+            id="main-scroll-container"
+            className={`flex-1 min-h-0 relative ${
+              isDashboard || isMlStudio || isDlStudio
+                ? 'overflow-hidden' 
+                : 'overflow-y-auto'
+            } ${
+              !isDashboard && !isMlStudio && !isDlStudio && !isDataPrep
+                ? 'p-8'
+                : ''
+            }`}
+          >
             {children}
           </div>
         </main>

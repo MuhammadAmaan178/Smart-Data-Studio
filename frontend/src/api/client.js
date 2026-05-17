@@ -36,6 +36,21 @@ export const trainDL = async (payload) => {
   return res.data;
 };
 
+export const getDLStatus = async () => {
+  const res = await axios.get(`${API_BASE}/dl/status`);
+  return res.data;
+};
+
+export const predictDL = async (payload) => {
+  const res = await axios.post(`${API_BASE}/dl/predict`, payload);
+  return res.data;
+};
+
+export const getDLFeatureBounds = async () => {
+  const res = await axios.post(`${API_BASE}/dl/feature-bounds`);
+  return res.data;
+};
+
 export const getSummary = async () => {
   const res = await axios.get(`${API_BASE}/summary`);
   return res.data;

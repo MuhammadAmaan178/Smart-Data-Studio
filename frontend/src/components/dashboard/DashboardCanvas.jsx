@@ -90,7 +90,11 @@ const DashboardCanvas = ({ isDataLoaded }) => {
     }
 
     // 2. Metrics (Horizontal row)
-    const metricCount = template === 'DEEP_DIVE' ? 4 : (template === 'COMPARISON' ? 0 : 2);
+    let metricCount = 3;
+    if (template === 'OVERVIEW') metricCount = 3;
+    else if (template === 'DEEP_DIVE') metricCount = 4;
+    else if (template === 'COMPARISON') metricCount = 2;
+
     for (let i = 0; i < metricCount; i++) {
       newWidgets.push({
         id: Date.now() + 10 + i, type: 'metric',
@@ -106,7 +110,9 @@ const DashboardCanvas = ({ isDataLoaded }) => {
 
     // 3. Charts
     let chartCount = 2;
-    if (template === 'COMPARISON') chartCount = 4;
+    if (template === 'OVERVIEW') chartCount = 2;
+    else if (template === 'DEEP_DIVE') chartCount = 1;
+    else if (template === 'COMPARISON') chartCount = 3;
 
     for (let i = 0; i < chartCount; i++) {
       const isSecondRow = i >= 2;
@@ -117,7 +123,7 @@ const DashboardCanvas = ({ isDataLoaded }) => {
           chart_type: chartConfigs[i]?.type || 'BAR', 
           x_column: chartConfigs[i]?.x || '', 
           y_column: chartConfigs[i]?.y || '', 
-          aggregation: 'MEAN', 
+          aggregation: chartConfigs[i]?.agg || 'MEAN', 
           theme: ['BRUTAL', 'NEON', 'WARM', 'MONO'][i%4] 
         }
       });
@@ -143,7 +149,7 @@ const DashboardCanvas = ({ isDataLoaded }) => {
       <div className="flex-1 flex flex-col min-w-0 bg-[#fef9ef] relative">
         
         {/* Canvas Toolbar */}
-        <div className="h-[48px] bg-[#fef9ef] border-b-[2px] border-black flex items-center justify-between px-4 shrink-0 z-20">
+        <div className="h-[48px] bg-[#fef9ef] border-b-[2px] border-black flex items-center justify-between px-4 shrink-0 z-10">
           <div className="flex gap-2">
             <button 
               onClick={clearCanvas}

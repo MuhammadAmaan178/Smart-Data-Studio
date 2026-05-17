@@ -19,7 +19,7 @@ const QueueDrawer = ({ queue, onRemove, onClearAll, onApplyAll, isApplying }) =>
       {/* TRIGGER TAB */}
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed right-0 top-1/2 -translate-y-1/2 w-8 h-20 bg-[#ffe45e] border-[2px] border-black border-l-[3px] rounded-l-[4px] cursor-pointer flex flex-col items-center justify-center z-50 hover:bg-[#ffeb85] transition-colors"
+        className="fixed right-0 top-1/2 -translate-y-1/2 w-8 h-20 bg-[#ffe45e] border-[2px] border-black border-l-[3px] rounded-l-[4px] cursor-pointer flex flex-col items-center justify-center z-[200] hover:bg-[#ffeb85] transition-colors"
       >
         <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black border-[2px] border-black mb-1 transition-transform ${
           queue.length > 0 ? 'bg-[#ff499e] text-white scale-110' : 'bg-black text-white scale-100'
@@ -37,14 +37,14 @@ const QueueDrawer = ({ queue, onRemove, onClearAll, onApplyAll, isApplying }) =>
       {/* BACKDROP */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/30 z-[48]"
+          className="fixed inset-0 bg-black/30 z-[198]"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* DRAWER PANEL */}
       <div 
-        className={`fixed right-0 top-0 h-screen w-80 bg-[#fef9ef] border-l-[3px] border-black shadow-[-6px_0px_0px_#000] z-[49] flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`fixed right-0 top-0 h-screen w-80 bg-[#fef9ef] border-l-[3px] border-black shadow-[-6px_0px_0px_#000] z-[199] flex flex-col transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >

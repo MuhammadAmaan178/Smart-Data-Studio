@@ -28,7 +28,7 @@ const PipelineHeader = ({ currentView }) => {
 
   return (
     <div 
-      className="flex flex-col shrink-0 w-full bg-[#fef9ef] border-b-[2px] border-black z-10"
+      className="flex flex-col shrink-0 w-full bg-[#fef9ef] border-b-[2px] border-black z-50"
       style={{ padding: '8px 24px', height: '48px', justifyContent: 'center' }}
     >
       <div className="flex items-center justify-between h-full">

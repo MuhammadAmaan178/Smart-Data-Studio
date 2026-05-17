@@ -8,7 +8,6 @@ import DLStudio from './components/dl-studio/DLStudio';
 import DataSummary from './components/summary/DataSummary';
 import FeatureEngineering from './components/feature-engineering/FeatureEngineering';
 import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
 
 import axios from 'axios';
 
@@ -175,7 +174,15 @@ function WorkspaceApp() {
   };
 
   return (
-    <>
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden'
+      }}
+    >
       <AppLayout
         currentView={currentView}
         setCurrentView={setCurrentView}
@@ -191,7 +198,13 @@ function WorkspaceApp() {
       >
 
         {/* ── View: Data Prep ────────────────────────────────────────── */}
-        <div className={`${currentView === 'data-prep' ? 'block' : 'hidden'} w-full animate-in fade-in duration-300`}>
+        <div
+          style={{
+            display: currentView === 'data-prep' ? 'block' : 'none',
+            width: '100%'
+          }}
+          className="animate-in fade-in duration-300"
+        >
           <DataPrep 
             dataPreview={dataPreview} 
             isDataLoaded={isDataLoaded} 
@@ -203,17 +216,37 @@ function WorkspaceApp() {
         </div>
 
         {/* ── View: Data Summary ─────────────────────────────────────── */}
-        <div className={`${currentView === 'data-summary' ? 'block' : 'hidden'} animate-in fade-in duration-300`}>
+        <div
+          style={{
+            display: currentView === 'data-summary' ? 'block' : 'none',
+            width: '100%'
+          }}
+          className="animate-in fade-in duration-300"
+        >
           <DataSummary isDataLoaded={isDataLoaded} />
         </div>
 
         {/* ── View: Feature Engineering ──────────────────────────────── */}
-        <div className={`${currentView === 'feature-engineering' ? 'block' : 'hidden'} animate-in fade-in duration-300`}>
+        <div
+          style={{
+            display: currentView === 'feature-engineering' ? 'block' : 'none',
+            width: '100%'
+          }}
+          className="animate-in fade-in duration-300"
+        >
           <FeatureEngineering isDataLoaded={isDataLoaded} />
         </div>
 
         {/* ── View: Dashboard ────────────────────────────────────────── */}
-        <div className={`${currentView === 'dashboard' ? 'block h-full' : 'hidden'} animate-in fade-in duration-300`}>
+        <div
+          style={{
+            display: currentView === 'dashboard' ? 'flex' : 'none',
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden'
+          }}
+          className="animate-in fade-in duration-300"
+        >
           {dataPreview ? (
             <DashboardCanvas
               cards={cards}
@@ -223,7 +256,7 @@ function WorkspaceApp() {
               anomalyReport={anomalyReport}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-black">
+            <div className="flex flex-col items-center justify-center h-full text-black w-full">
               <div className="p-4 bg-[#ff499e] border-[3px] border-black rounded-full mb-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               </div>
@@ -248,7 +281,15 @@ function WorkspaceApp() {
         </div>
 
         {/* ── View: ML Studio ────────────────────────────────────────── */}
-        <div className={`${currentView === 'ml-studio' ? 'block h-full' : 'hidden'} animate-in fade-in duration-300`}>
+        <div
+          style={{
+            display: currentView === 'ml-studio' ? 'flex' : 'none',
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden'
+          }}
+          className="animate-in fade-in duration-300"
+        >
           <MLStudio 
             anomalyReport={anomalyReport} 
             config={mlConfig} 
@@ -257,7 +298,15 @@ function WorkspaceApp() {
         </div>
 
         {/* ── View: DL Studio ────────────────────────────────────────── */}
-        <div className={`${currentView === 'dl-studio' ? 'block h-full' : 'hidden'} animate-in fade-in duration-300`}>
+        <div
+          style={{
+            display: currentView === 'dl-studio' ? 'flex' : 'none',
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden'
+          }}
+          className="animate-in fade-in duration-300"
+        >
           <DLStudio 
             anomalyReport={anomalyReport} 
             config={dlConfig} 
@@ -274,7 +323,7 @@ function WorkspaceApp() {
           onDemoLoaded={handleDemoLoaded}
         />
       )}
-    </>
+    </div>
   );
 }
 

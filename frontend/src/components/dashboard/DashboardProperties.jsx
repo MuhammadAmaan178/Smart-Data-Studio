@@ -1,8 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Check, ChevronRight, ChevronLeft } from 'lucide-react';
+import { getFeaturesInfo, getFullDataset } from '../../api/client';
 
-const DashboardProperties = ({ selectedWidget, updateWidget, deselectWidget, columns = [] }) => {
+const DashboardProperties = ({ selectedWidget, updateWidget, deselectWidget }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [columns, setColumns] = useState([]);
+
+  useEffect(() => {
+    const fetchColumns = async () => {
+      try {
+        const res = await getFeaturesInfo();
+        setColumns(res.columns.map(c => c.name));
+      } catch {
+        try {
+          const res = await getFullDataset();
+          if (res.data && res.data.length > 0) {
+            setColumns(Object.keys(res.data[0]));
+          }
+        } catch (err) {
+          console.error('Could not load columns', err);
+        }
+      }
+    };
+    fetchColumns();
+  }, []);
 
   if (!selectedWidget) {
     return (
@@ -76,7 +97,7 @@ const DashboardProperties = ({ selectedWidget, updateWidget, deselectWidget, col
             className="w-full border-[2px] border-black p-1.5 font-bold uppercase text-xs focus:outline-none bg-white"
           >
             <option value="">-- SELECT --</option>
-            {columns.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+            {columns.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
         <div>
@@ -105,6 +126,27 @@ const DashboardProperties = ({ selectedWidget, updateWidget, deselectWidget, col
           />
         </div>
         <div>
+          <label className="block text-[10px] font-black uppercase mb-2">Value Size</label>
+          <div className="flex gap-2">
+            {[
+              { label: 'SMALL', val: '24px' },
+              { label: 'MEDIUM', val: '36px' },
+              { label: 'LARGE', val: '48px' },
+              { label: 'HUGE', val: '64px' }
+            ].map(sz => {
+              const isActive = (config.valueFontSize || '48px') === sz.val;
+              return (
+                <button 
+                  key={sz.label} onClick={() => handleChange('valueFontSize', sz.val)}
+                  className={`flex-1 py-1.5 border-[2px] border-black font-black uppercase text-[10px] ${isActive ? 'bg-black text-white' : 'bg-white text-black hover:bg-gray-100'}`}
+                >
+                  {sz.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div>
           <label className="block text-[10px] font-black uppercase mb-1">Accent Color</label>
           <div className="flex gap-2">
             {['#ffe45e', '#00f0ff', '#ff499e', '#ff8c00'].map(col => (
@@ -122,17 +164,73 @@ const DashboardProperties = ({ selectedWidget, updateWidget, deselectWidget, col
     </div>
   );
 
+  const CHART_ICONS = {
+    BAR: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="2" y="10" width="3" height="8" fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+        <rect x="7" y="6" width="3" height="12" fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+        <rect x="12" y="3" width="3" height="15" fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+        <rect x="17" y="8" width="3" height="10" fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+        <line x1="1" y1="18" x2="20" y2="18" stroke="currentColor" strokeWidth="1.5"/>
+      </svg>
+    ),
+    LINE: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <polyline points="1,15 5,9 9,12 13,4 17,7 20,3" fill="none" stroke="currentColor" strokeWidth="2"/>
+        <line x1="1" y1="18" x2="20" y2="18" stroke="currentColor" strokeWidth="1.5"/>
+      </svg>
+    ),
+    SCATTER: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="4" cy="14" r="2" fill="currentColor"/>
+        <circle cx="8" cy="8" r="2" fill="currentColor"/>
+        <circle cx="13" cy="11" r="2" fill="currentColor"/>
+        <circle cx="17" cy="5" r="2" fill="currentColor"/>
+        <circle cx="11" cy="4" r="2" fill="currentColor"/>
+        <line x1="1" y1="18" x2="20" y2="18" stroke="currentColor" strokeWidth="1.5"/>
+        <line x1="1" y1="1" x2="1" y2="18" stroke="currentColor" strokeWidth="1.5"/>
+      </svg>
+    ),
+    PIE: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10,10 L10,2 A8,8 0 0,1 17,14 Z" fill="currentColor"/>
+        <path d="M10,10 L17,14 A8,8 0 0,1 3,14 Z" fill="currentColor" opacity="0.5"/>
+        <path d="M10,10 L3,14 A8,8 0 0,1 10,2 Z" fill="currentColor" opacity="0.25"/>
+        <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+      </svg>
+    ),
+    AREA: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <polygon points="1,15 5,9 9,12 13,4 17,7 20,3 20,18 1,18" fill="currentColor" opacity="0.6"/>
+        <polyline points="1,15 5,9 9,12 13,4 17,7 20,3" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+        <line x1="1" y1="18" x2="20" y2="18" stroke="currentColor" strokeWidth="1.5"/>
+      </svg>
+    ),
+    HISTOGRAM: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="1" y="12" width="3" height="6" fill="currentColor"/>
+        <rect x="5" y="6" width="3" height="12" fill="currentColor"/>
+        <rect x="9" y="4" width="3" height="14" fill="currentColor"/>
+        <rect x="13" y="8" width="3" height="10" fill="currentColor"/>
+        <rect x="17" y="13" width="3" height="5" fill="currentColor"/>
+        <line x1="1" y1="18" x2="20" y2="18" stroke="currentColor" strokeWidth="1.5"/>
+      </svg>
+    )
+  };
+
   const renderChartProps = () => (
     <div className="p-4 space-y-6 overflow-y-auto max-h-[calc(100vh-150px)] pb-20">
       <div className="space-y-2">
         <h4 className="font-black text-[10px] uppercase bg-black text-white px-2 py-1 inline-block">CHART TYPE</h4>
-        <div className="grid grid-cols-3 gap-2">
-          {['BAR', 'LINE', 'SCATTER', 'PIE', 'AREA', 'HISTOGRAM', 'BUBBLE', 'VIOLIN', 'BOXPLOT'].map(ct => (
+        <div className="grid grid-cols-2 gap-2">
+          {['BAR', 'LINE', 'SCATTER', 'PIE', 'AREA', 'HISTOGRAM'].map(ct => (
             <button 
               key={ct} onClick={() => handleChange('chart_type', ct)}
-              className={`py-2 border-[2px] border-black font-black uppercase text-[9px] ${config.chart_type === ct ? 'bg-[#ffe45e] shadow-[2px_2px_0px_#000] -translate-y-px -translate-x-px' : 'bg-white hover:bg-gray-100'} transition-all`}
+              className={`py-2 px-3 border-[2px] border-black font-black uppercase text-[10px] ${config.chart_type === ct ? 'bg-[#ffe45e] shadow-[2px_2px_0px_#000] -translate-y-px -translate-x-px' : 'bg-white hover:bg-gray-100'} transition-all`}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', justifyContent: 'center' }}
             >
-              {ct}
+              {CHART_ICONS[ct]}
+              <span>{ct}</span>
             </button>
           ))}
         </div>
@@ -148,7 +246,7 @@ const DashboardProperties = ({ selectedWidget, updateWidget, deselectWidget, col
             className="w-full border-[2px] border-black p-1.5 font-bold uppercase text-xs focus:outline-none bg-white"
           >
             <option value="">-- SELECT --</option>
-            {columns.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+            {columns.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
         
@@ -161,24 +259,12 @@ const DashboardProperties = ({ selectedWidget, updateWidget, deselectWidget, col
               className="w-full border-[2px] border-black p-1.5 font-bold uppercase text-xs focus:outline-none bg-white"
             >
               <option value="">-- SELECT --</option>
-              {columns.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+              {columns.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
         )}
 
-        {config.chart_type === 'BUBBLE' && (
-          <div>
-            <label className="block text-[10px] font-black uppercase mb-1">SIZE COLUMN (BUBBLE)</label>
-            <select 
-              value={config.size_column || ''} 
-              onChange={(e) => handleChange('size_column', e.target.value)}
-              className="w-full border-[2px] border-black p-1.5 font-bold uppercase text-xs focus:outline-none bg-white"
-            >
-              <option value="">-- OPTIONAL --</option>
-              {columns.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-            </select>
-          </div>
-        )}
+
 
         {['BAR', 'LINE', 'AREA'].includes(config.chart_type) && (
           <div>

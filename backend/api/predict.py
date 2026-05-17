@@ -21,3 +21,9 @@ def predict():
     except Exception as e:
         print(f"Prediction logic error: {e}")
         return jsonify({"error": f"Python Error: {str(e)}"}), 500
+
+@predict_bp.route('/feature-bounds', methods=['GET'])
+def get_feature_bounds():
+    from services.model_store import latest_model_store
+    bounds = latest_model_store.get("feature_bounds", {})
+    return jsonify({"bounds": bounds})

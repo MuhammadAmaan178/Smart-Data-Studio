@@ -8,6 +8,7 @@ import {
 } from '../../api/client';
 import AddColumnModal from './AddColumnModal';
 import QueueDrawer from './QueueDrawer';
+import Toast from '../ui/Toast';
 
 const DataPrep = ({ 
   dataPreview, isDataLoaded, anomalyReport, onOpenDemoModal,
@@ -29,6 +30,14 @@ const DataPrep = ({
   const [previewRows, setPreviewRows] = useState('first'); // 'first' or 'last'
   const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false);
   const [fullDataset, setFullDataset] = useState([]);
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
+
+  const showToast = (message, type = 'success') => {
+    setToast({ visible: true, message, type });
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, visible: false }));
+    }, 2500);
+  };
 
   // Initialize data from backend on mount/data load
   useEffect(() => {
@@ -66,11 +75,58 @@ const DataPrep = ({
 
   // ── Handlers ──────────────────────────────────────────────────────────
   const queueAction = (action) => {
+    if (action.type === 'duplicates') {
+      const alreadyQueued = actionQueue.some(a => a.type === 'duplicates');
+      if (alreadyQueued) {
+        showToast('Drop duplicates already in queue', 'error');
+        return;
+      }
+    }
+
+    if (action.type === 'missing') {
+      const alreadyQueued = actionQueue.some(a => a.type === 'missing' && a.column === action.column);
+      if (alreadyQueued) {
+        showToast(`${action.column} already queued`, 'error');
+        return;
+      }
+    }
+
+    if (action.type === 'string') {
+      const alreadyQueued = actionQueue.some(a => a.type === 'string' && a.column === action.column);
+      if (alreadyQueued) {
+        showToast(`${action.column} already queued`, 'error');
+        return;
+      }
+    }
+
+    if (action.type === 'outlier') {
+      const alreadyQueued = actionQueue.some(a => a.type === 'outlier' && a.column === action.column);
+      if (alreadyQueued) {
+        showToast(`${action.column} already queued`, 'error');
+        return;
+      }
+    }
+
     setActionQueue(prev => [...prev, { id: Date.now().toString(), ...action }]);
+    if (action.type === 'duplicates') {
+      showToast('Duplicates queued for removal');
+    } else if (action.type === 'missing') {
+      showToast(`Missing values queued — ${action.column} · ${action.strategy}`);
+    } else if (action.type === 'string') {
+      showToast(`String cleaning queued — ${action.column}`);
+    } else if (action.type === 'outlier') {
+      showToast(`Outlier handling queued — ${action.column}`);
+    }
   };
 
   const removeQueuedAction = (id) => {
     setActionQueue(prev => prev.filter(a => a.id !== id));
+    showToast('Action removed from queue', 'error');
+  };
+
+  const clearQueue = () => {
+    setActionQueue([]);
+    showToast('Queue cleared', 'error');
   };
 
   const handleSchemaChange = async (col, newType) => {
@@ -554,7 +610,7 @@ const DataPrep = ({
       <QueueDrawer 
         queue={actionQueue}
         onRemove={removeQueuedAction}
-        onClearAll={() => setActionQueue([])}
+        onClearAll={clearQueue}
         onApplyAll={applyAllChanges}
         isApplying={isApplying}
       />
@@ -610,6 +666,11 @@ const DataPrep = ({
         </div>
       )}
 
+      <Toast 
+        message={toast.message} 
+        type={toast.type}
+        visible={toast.visible} 
+      />
     </div>
   );
 };
