@@ -5,7 +5,7 @@ import {
   Database, Save, Download,
   PanelLeftClose, PanelLeftOpen, RefreshCw, Trash2,
   Wifi, ChevronDown, FolderOpen, Sparkles, FileText,
-  Cloud, LogOut,
+  Cloud, LogOut, Menu,
 } from 'lucide-react';
 
 // ─── Click-outside dropdown hook ─────────────────────────────────
@@ -175,6 +175,15 @@ const Header = ({
 
         {/* Left: Logo + Project Name */}
         <div className="flex items-center gap-3">
+          {/* Hamburger button for mobile overlay drawer */}
+          <button
+            onClick={toggleSidebar}
+            className="md:hidden p-1 mr-1 text-black bg-white border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-200 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-none cursor-pointer"
+            title="Toggle Menu"
+          >
+            <Menu size={16} strokeWidth={3} />
+          </button>
+
           <div className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 bg-black flex items-center justify-center text-[#00f0ff] text-xl font-black shadow-[2px_2px_0px_0px_rgba(255,73,158,1)] border-2 border-black transform -rotate-3">
               S
@@ -286,7 +295,7 @@ const Header = ({
 
       {/* ── Menu Bar Wrapper (bottom row) ─────────────────────────── */}
       <div>
-        <div className="flex items-center gap-0.5 h-8 px-2 relative">
+        <div className="flex items-center gap-1.5 h-8 px-2 overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-none relative">
           <DropdownMenu label="File"    items={fileItems}    />
           <DropdownMenu label="View"    items={viewItems}    />
           <DropdownMenu label="Runtime" items={runtimeItems} />

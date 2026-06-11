@@ -395,18 +395,10 @@ const MLStudio = ({ anomalyReport, config = {}, setConfig }) => {
         }
       `}</style>
 
-      <div
-        style={{
-          display: 'flex',
-          flex: 1,
-          width: '100%',
-          minHeight: 0,
-          overflow: 'hidden'
-        }}
-      >
+      <div className="flex flex-col md:flex-row flex-1 w-full min-h-0 overflow-y-auto md:overflow-hidden bg-[#fef9ef]">
 
       {/* ── LEFT COLUMN: MODEL CONFIGURATION ── */}
-      <aside style={{ width: '340px', minWidth: '340px', flexShrink: 0, overflowY: 'auto', borderRight: '2px solid black', backgroundColor: 'white', display: 'flex', flexDirection: 'column' }} className="select-none">
+      <aside className="w-full md:w-[340px] md:min-w-[340px] shrink-0 border-b-2 md:border-b-0 md:border-r-2 border-black bg-white flex flex-col overflow-y-auto select-none">
         
         {/* Sidebar Header */}
         <div className="p-4 bg-black text-white flex items-center gap-3 shrink-0">
@@ -753,7 +745,7 @@ const MLStudio = ({ anomalyReport, config = {}, setConfig }) => {
       </aside>
 
       {/* ── RIGHT COLUMN: RESULTS CANVAS ── */}
-      <main style={{ flex: 1, minWidth: 0, overflowY: 'auto', padding: '24px', backgroundColor: '#fef9ef' }}>
+      <main className="flex-1 min-w-0 p-4 md:p-6 overflow-y-auto bg-[#fef9ef]">
         
         {/* Error bar */}
         {error && (
@@ -774,7 +766,7 @@ const MLStudio = ({ anomalyReport, config = {}, setConfig }) => {
               CONFIGURE YOUR MODEL PIPELINE CONTROLS ON THE LEFT SIDE AND HIT "RUN MODEL".
             </p>
 
-            <div className="grid grid-cols-3 gap-6 w-full max-w-3xl mt-12 select-none">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 w-full max-w-3xl mt-12 select-none">
               {[
                 { icon: <Target size={28} />, title: 'ACCURACY METRICS', desc: 'INSTANT WEIGHTED CRITERION CALCULATIONS AND SCORES.' },
                 { icon: <Layers size={28} />, title: 'VISUAL CHARTS', desc: 'ACTUAL VS PREDICTED Cartesian plots and residual bars.' },
@@ -808,7 +800,7 @@ const MLStudio = ({ anomalyReport, config = {}, setConfig }) => {
           <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-300">
             
             {/* SECTION A — MODEL SUMMARY CARD */}
-            <div className="bg-white border-[3px] border-black p-6 shadow-[6px_6px_0px_#000] flex items-center justify-between">
+            <div className="bg-white border-[3px] border-black p-4 md:p-6 shadow-[6px_6px_0px_#000] flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <h2 className="text-3xl font-black uppercase tracking-tight text-black">{results.algorithm}</h2>
@@ -838,7 +830,7 @@ const MLStudio = ({ anomalyReport, config = {}, setConfig }) => {
                 {/* SECTION B — METRICS GRID */}
                 <div className="space-y-4">
                   <h4 className="font-black text-sm uppercase tracking-wider text-black">SECTION B — PERFORMANCE SCOREBOARD</h4>
-                  <div className="grid grid-cols-4 gap-6">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                     {[
                       { label: 'ACCURACY', val: `${results.accuracy}%`, color: 'bg-[#ffe45e]' },
                       { label: 'PRECISION', val: `${results.precision}%`, color: 'bg-white' },
@@ -919,8 +911,8 @@ const MLStudio = ({ anomalyReport, config = {}, setConfig }) => {
                 {/* SECTION D — CLASSIFICATION REPORT TABLE */}
                 <div className="space-y-4">
                   <h4 className="font-black text-sm uppercase tracking-wider text-black">SECTION D — CLASSIFICATION REPORT REPORT</h4>
-                  <div className="bg-white border-[3px] border-black shadow-[6px_6px_0px_#000] overflow-hidden select-none">
-                    <table className="w-full text-left border-collapse text-xs">
+                  <div className="bg-white border-[3px] border-black shadow-[6px_6px_0px_#000] overflow-x-auto select-none">
+                    <table className="w-full text-left border-collapse text-xs min-w-[500px]">
                       <thead>
                         <tr className="bg-black text-white border-b-2 border-black">
                           <th className="p-3 font-black uppercase tracking-wider">CLASS</th>
@@ -973,7 +965,7 @@ const MLStudio = ({ anomalyReport, config = {}, setConfig }) => {
                 {/* SECTION B — METRICS GRID */}
                 <div className="space-y-4">
                   <h4 className="font-black text-sm uppercase tracking-wider text-black">SECTION B — REGRESSION SCOREBOARD</h4>
-                  <div className="grid grid-cols-4 gap-6">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                     {[
                       { label: 'R² SCORE (VARIANCE)', val: results.r2, color: 'bg-[#ffe45e]' },
                       { label: 'MEAN ABSOLUTE ERROR', val: results.mae, color: 'bg-white' },
@@ -1056,7 +1048,7 @@ const MLStudio = ({ anomalyReport, config = {}, setConfig }) => {
                 {/* SECTION B — METRICS GRID */}
                 <div className="space-y-4">
                   <h4 className="font-black text-sm uppercase tracking-wider text-black">SECTION B — CLUSTERING SCOREBOARD</h4>
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                     
                     <div className="border-[2px] border-black p-4 shadow-[4px_4px_0px_#000] flex flex-col justify-between h-28 bg-white">
                       <span className="text-[10px] font-black uppercase text-gray-500">WCSS INERTIA (LOWER = TIGHTER CLUSTERS)</span>
@@ -1168,7 +1160,7 @@ const MLStudio = ({ anomalyReport, config = {}, setConfig }) => {
                 </div>
 
                 {/* Input Fields Grid */}
-                <div className="grid grid-cols-3 gap-4 pt-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
                   {featureCols.map(col => {
                     const bounds = storedBounds[col] || { min: 0.0, max: 1.0 };
                     return (

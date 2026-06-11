@@ -16,10 +16,12 @@ const NAV_ITEMS = [
 const Sidebar = ({ currentView, setCurrentView, isOpen, toggleSidebar }) => {
   return (
     <aside
-      className={`h-full flex flex-col shrink-0
+      className={`fixed md:relative top-0 bottom-0 left-0 z-50 h-full flex flex-col shrink-0
                   bg-[#ffe45e] border-r-[3px] border-black
-                  transition-none
-                  ${isOpen ? 'w-[280px]' : 'w-16'}`}
+                  transition-all duration-300 ease-in-out
+                  ${isOpen 
+                    ? 'translate-x-0 w-[280px] shadow-[4px_0px_0px_0px_rgba(0,0,0,1)]' 
+                    : '-translate-x-full md:translate-x-0 w-[280px] md:w-16'}`}
     >
       {/* Toggle button */}
       <div className={`flex items-center h-12 px-3 border-b-[3px] border-black
@@ -41,7 +43,12 @@ const Sidebar = ({ currentView, setCurrentView, isOpen, toggleSidebar }) => {
           return (
             <button
               key={id}
-              onClick={() => setCurrentView(id)}
+              onClick={() => {
+                setCurrentView(id);
+                if (window.innerWidth <= 768) {
+                  toggleSidebar();
+                }
+              }}
               title={!isOpen ? label : undefined}
               className={`w-full flex items-center gap-3 px-3 py-3 font-black uppercase tracking-wider
                           border-[3px] border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]

@@ -27,7 +27,7 @@ const DashboardProperties = ({ selectedWidget, updateWidget, deselectWidget }) =
 
   if (!selectedWidget) {
     return (
-      <div className="w-[300px] shrink-0 bg-white border-l-[3px] border-black flex flex-col items-center justify-center p-8 text-center">
+      <div className="w-full lg:w-[300px] shrink-0 bg-white border-t-[3px] lg:border-t-0 lg:border-l-[3px] border-black flex flex-col items-center justify-center p-6 lg:p-8 text-center">
         <div className="w-12 h-12 rounded-full border-[3px] border-black bg-[#fef9ef] flex items-center justify-center mb-4">
           <span className="font-black text-2xl">⚙</span>
         </div>
@@ -341,20 +341,20 @@ const DashboardProperties = ({ selectedWidget, updateWidget, deselectWidget }) =
   if (isCollapsed) {
     return (
       <div 
-        className="w-[40px] shrink-0 bg-[#ffe45e] border-l-[3px] border-black flex flex-col items-center py-4 cursor-pointer hover:bg-yellow-400 transition-colors z-10"
+        className="w-full lg:w-[40px] shrink-0 bg-[#ffe45e] border-t-[3px] lg:border-t-0 lg:border-l-[3px] border-black flex flex-row lg:flex-col items-center justify-between lg:justify-start lg:py-4 px-4 lg:px-0 py-2 cursor-pointer hover:bg-yellow-400 transition-colors z-10"
         onClick={() => setIsCollapsed(false)}
         title="Expand Properties"
       >
-        <ChevronLeft size={24} strokeWidth={3} className="text-black" />
-        <div className="mt-8" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
-          <span className="font-black uppercase tracking-widest text-sm">PROPERTIES</span>
+        <div className="flex items-center lg:flex-col gap-2">
+          <ChevronLeft size={24} strokeWidth={3} className="text-black rotate-90 lg:rotate-0" />
+          <span className="font-black uppercase tracking-widest text-[10px] lg:text-sm lg:mt-8 lg:[writing-mode:vertical-rl] lg:rotate-180">PROPERTIES</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-[300px] shrink-0 bg-white border-l-[3px] border-black flex flex-col h-full transition-all duration-250">
+    <div className="w-full lg:w-[300px] shrink-0 bg-white border-t-[3px] lg:border-t-0 lg:border-l-[3px] border-black flex flex-col h-auto lg:h-full transition-all duration-250">
       <div className="bg-black text-white p-4 flex justify-between items-center shrink-0">
         <div className="flex items-center gap-2">
           <button onClick={() => setIsCollapsed(true)} className="hover:text-gray-300 transition-colors mr-2">

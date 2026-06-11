@@ -49,22 +49,28 @@ const AppLayout = ({
 
 
       {/* Body row */}
-      <div className="flex flex-1 min-h-0 overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden relative">
 
         {/* Animated Sidebar */}
-        <div>
-          <Sidebar
-            currentView={currentView}
-            setCurrentView={setCurrentView}
-            isOpen={sidebarOpen}
-            toggleSidebar={toggleSidebar}
+        <Sidebar
+          currentView={currentView}
+          setCurrentView={setCurrentView}
+          isOpen={sidebarOpen}
+          toggleSidebar={toggleSidebar}
+        />
+
+        {/* Overlay backdrop for mobile drawer */}
+        {sidebarOpen && (
+          <div
+            onClick={toggleSidebar}
+            className="fixed inset-0 bg-black/40 z-40 md:hidden cursor-pointer"
           />
-        </div>
+        )}
 
         {/* Main canvas */}
         <main 
           className={`flex-1 min-w-0 transition-none flex flex-col
-                      bg-[#ffffff] border-l-[3px] border-black`}
+                      bg-[#ffffff] md:border-l-[3px] border-l-0 border-black`}
         >
           <PipelineHeader currentView={currentView} />
           

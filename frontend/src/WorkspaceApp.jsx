@@ -411,6 +411,7 @@ function WorkspaceApp({ session: propSession, onSessionChange }) {
               layout={layout}
               setLayout={setLayout}
               anomalyReport={anomalyReport}
+              isDataLoaded={isDataLoaded}
             />
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-black w-full">
