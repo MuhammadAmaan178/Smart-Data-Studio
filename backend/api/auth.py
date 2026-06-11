@@ -31,13 +31,18 @@ def verify_token(token):
 
 @auth_bp.route('/signup', methods=['POST'])
 def signup():
-    data = request.get_json()
+    data = request.get_json(silent=True) or request.form or {}
     username = (data.get('username') or data.get('full_name', '')).strip()
-    email = data.get('email', '').strip().lower()
+    email = data.get('email', '')
+    if isinstance(email, str):
+        email = email.strip().lower()
+    else:
+        email = ''
     password = data.get('password', '')
 
     if not username or not email or not password:
-        return jsonify({'error': 'All fields are required'}), 400
+        print(f"[DEPLOY DEBUG] Extracted Request Payload Keys: {list(data.keys())}", flush=True)
+        return jsonify({'error': 'Missing parameters or corrupted network payload transmission'}), 400
 
     if len(password) < 6:
         return jsonify({'error': 'Password must be at least 6 characters'}), 400
@@ -79,12 +84,17 @@ def signup():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    email = data.get('email', '').strip().lower()
+    data = request.get_json(silent=True) or request.form or {}
+    email = data.get('email', '')
+    if isinstance(email, str):
+        email = email.strip().lower()
+    else:
+        email = ''
     password = data.get('password', '')
 
     if not email or not password:
-        return jsonify({'error': 'Email and password are required'}), 400
+        print(f"[DEPLOY DEBUG] Extracted Request Payload Keys: {list(data.keys())}", flush=True)
+        return jsonify({'error': 'Missing parameters or corrupted network payload transmission'}), 400
 
     # Find user by email
     users = db_select('users', filters={'email': email})
