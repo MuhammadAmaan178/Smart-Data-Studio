@@ -1,3 +1,12 @@
+---
+title: Smart DataStudio Backend
+emoji: 🚀
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+---
+
 # Smart DataStudio 🚀
 
 **Smart DataStudio** is a production-grade, self-contained data science workspace designed for seamless data exploration, automated anomaly detection, and machine learning/deep learning model training.
