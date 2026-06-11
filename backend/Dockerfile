@@ -26,4 +26,4 @@ COPY --chown=user . .
 EXPOSE 7860
 
 # Run with Gunicorn bound to Hugging Face's mandatory port 7860
-CMD ["gunicorn", "-b", "0.0.0.0:7860", "--timeout", "120", "app:app"]
+CMD ["python", "app.py"]
