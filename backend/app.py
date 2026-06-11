@@ -1,11 +1,12 @@
+import os
+from dotenv import load_dotenv
+load_dotenv(override=True)
+
 import numpy as np
 import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from dotenv import load_dotenv
-import os
 
-load_dotenv(override=True)
 
 from services.data_processor import global_store
 from api.upload import upload_bp

@@ -7,6 +7,11 @@ load_dotenv(override=True)
 SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_ANON_KEY = os.getenv('SUPABASE_ANON_KEY')
 
+if not os.getenv('SUPABASE_URL'):
+    print("[DEBUG] WARNING: SUPABASE_URL is missing from environment variables!")
+if not os.getenv('SUPABASE_ANON_KEY'):
+    print("[DEBUG] WARNING: SUPABASE_ANON_KEY is missing from environment variables!")
+
 # Clean headers tailored perfectly for the new 'sb_' key format
 HEADERS = {
     'apikey': SUPABASE_ANON_KEY,
@@ -15,8 +20,17 @@ HEADERS = {
 }
 
 def get_supabase_client():
-    """Returns URL and Headers for database interactions"""
-    return SUPABASE_URL, HEADERS
+    """Returns URL and Headers for database interactions dynamically with safety checks"""
+    url = os.getenv('SUPABASE_URL') or SUPABASE_URL
+    key = os.getenv('SUPABASE_ANON_KEY') or SUPABASE_ANON_KEY
+    if not url:
+        print("[DEBUG] WARNING: SUPABASE_URL env var could not be retrieved from environment during execution!")
+    headers = {
+        'apikey': key,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+    }
+    return url, headers
 
 import re
 
@@ -53,29 +67,33 @@ def execute_with_fallback(url, json_data, headers, retries=3):
     return {"error": "Max retries exceeded during self-healing"}
 
 def db_select(table, filters=None, columns='*'):
-    url = f"{SUPABASE_URL}/rest/v1/{table}?select={columns}"
+    url, headers = get_supabase_client()
+    full_url = f"{url}/rest/v1/{table}?select={columns}"
     if filters:
         for key, value in filters.items():
-            url += f"&{key}=eq.{value}"
-    res = requests.get(url, headers=HEADERS)
+            full_url += f"&{key}=eq.{value}"
+    res = requests.get(full_url, headers=headers)
     try:
         return res.json()
     except Exception:
         return {"error": res.text}
 
 def db_insert(table, data):
-    url = f"{SUPABASE_URL}/rest/v1/{table}"
-    return execute_with_fallback(url, data, HEADERS)
+    url, headers = get_supabase_client()
+    full_url = f"{url}/rest/v1/{table}"
+    return execute_with_fallback(full_url, data, headers)
 
 def db_upsert(table, data):
-    url = f"{SUPABASE_URL}/rest/v1/{table}"
-    headers = {**HEADERS, 'Prefer': 'resolution=merge-duplicates,return=representation'}
-    return execute_with_fallback(url, data, headers)
+    url, headers = get_supabase_client()
+    full_url = f"{url}/rest/v1/{table}"
+    upsert_headers = {**headers, 'Prefer': 'resolution=merge-duplicates,return=representation'}
+    return execute_with_fallback(full_url, data, upsert_headers)
 
 def db_delete(table, filters):
-    url = f"{SUPABASE_URL}/rest/v1/{table}"
+    url, headers = get_supabase_client()
+    full_url = f"{url}/rest/v1/{table}"
     if filters:
         params = '&'.join([f"{k}=eq.{v}" for k, v in filters.items()])
-        url += f"?{params}"
-    res = requests.delete(url, headers=HEADERS)
+        full_url += f"?{params}"
+    res = requests.delete(full_url, headers=headers)
     return res.status_code
