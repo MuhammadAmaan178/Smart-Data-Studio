@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getAuthHeader } from './auth';
 
-const BASE_URL = 'http://localhost:5000/api/projects';
+const BASE_URL = 'https://amaan909-smart-datastudio-backend.hf.space/api/projects';
 
 export const fetchProjects = async () => {
   const res = await axios.get(`${BASE_URL}/list`, {

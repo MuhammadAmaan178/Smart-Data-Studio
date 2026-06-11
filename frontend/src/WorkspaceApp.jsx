@@ -14,6 +14,8 @@ import { saveProject } from './utils/projects';
 
 import axios from 'axios';
 
+const API_BASE_URL = "https://amaan909-smart-datastudio-backend.hf.space";
+
 function WorkspaceApp({ session: propSession, onSessionChange }) {
   const session = getSession() || propSession;
   const [currentView, setCurrentView] = useState('data-prep');
@@ -95,7 +97,7 @@ function WorkspaceApp({ session: propSession, onSessionChange }) {
         // Restore Backend Data if present
         if (config.rawDataset) {
           try {
-            const restoreRes = await axios.post('http://localhost:5000/api/restore', { data: config.rawDataset });
+            const restoreRes = await axios.post(`${API_BASE_URL}/api/restore`, { data: config.rawDataset });
             setDataPreview(restoreRes.data.data_preview);
             setAnomalyReport(restoreRes.data.anomaly_report);
             setIsDataLoaded(true);
@@ -125,7 +127,7 @@ function WorkspaceApp({ session: propSession, onSessionChange }) {
       } else {
         // Reset backend for a clean slate
         try {
-          await axios.post('http://localhost:5000/api/clear');
+          await axios.post(`${API_BASE_URL}/api/clear`);
         } catch (e) {
           console.error("Reset failed", e);
         }
@@ -155,7 +157,7 @@ function WorkspaceApp({ session: propSession, onSessionChange }) {
     
     let rawDataset = null;
     try {
-      const res = await axios.get('http://localhost:5000/api/export');
+      const res = await axios.get(`${API_BASE_URL}/api/export`);
       rawDataset = res.data.data;
     } catch (e) {
       console.error("Export dataset failed", e);
@@ -231,7 +233,7 @@ function WorkspaceApp({ session: propSession, onSessionChange }) {
     formData.append('file', file);
     
     try {
-      const res = await axios.post('http://localhost:5000/api/upload', formData, {
+      const res = await axios.post(`${API_BASE_URL}/api/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setDataPreview(res.data.data_preview);
@@ -249,7 +251,7 @@ function WorkspaceApp({ session: propSession, onSessionChange }) {
   const handleSaveWorkspace = async () => {
     try {
       // Fetch the full dataset from backend to make the file self-contained
-      const res = await axios.get('http://localhost:5000/api/export');
+      const res = await axios.get(`${API_BASE_URL}/api/export`);
       const rawDataset = res.data.data; // New structure: { success: true, data: [...] }
 
       const workspaceState = {
@@ -290,7 +292,7 @@ function WorkspaceApp({ session: propSession, onSessionChange }) {
         if (state.rawDataset) {
           try {
             // Push full data back to server
-            const restoreRes = await axios.post('http://localhost:5000/api/restore', { data: state.rawDataset });
+            const restoreRes = await axios.post(`${API_BASE_URL}/api/restore`, { data: state.rawDataset });
             // Refresh data preview and anomaly report from the live backend response
             setDataPreview(restoreRes.data.data_preview);
             setAnomalyReport(restoreRes.data.anomaly_report);

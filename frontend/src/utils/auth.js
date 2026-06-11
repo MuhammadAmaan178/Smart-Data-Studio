@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5000/api/auth';
+const BASE_URL = 'https://amaan909-smart-datastudio-backend.hf.space/api/auth';
 const TOKEN_KEY = 'sds_token';
 
 // SIGN UP

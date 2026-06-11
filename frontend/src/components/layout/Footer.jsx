@@ -11,7 +11,7 @@ const Footer = () => {
       </div>
       <div className="flex items-center gap-2">
         <div className="w-1.5 h-1.5 rounded-full bg-green-300 animate-pulse" />
-        <span>Backend: localhost:5000</span>
+        <span>Backend: HF Space</span>
       </div>
     </footer>
   );

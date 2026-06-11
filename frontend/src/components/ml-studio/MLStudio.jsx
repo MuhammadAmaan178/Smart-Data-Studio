@@ -262,7 +262,7 @@ const MLStudio = ({ anomalyReport, config = {}, setConfig }) => {
     });
 
     try {
-      const response = await fetch('http://localhost:5000/api/predict', {
+      const response = await fetch('https://amaan909-smart-datastudio-backend.hf.space/api/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ inputs: payloadInputs }),
