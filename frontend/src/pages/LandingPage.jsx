@@ -255,7 +255,7 @@ const LandingPage = ({ session }) => {
             <h2 className="text-4xl font-black uppercase text-black tracking-tight">Three Steps to Insights</h2>
           </div>
 
-          <div className="relative flex flex-col md:flex-row items-start md:items-center gap-10 md:gap-0">
+          <div className="relative w-full max-w-md mx-auto flex flex-col items-center justify-center text-center md:w-auto md:max-w-none md:mx-0 md:flex-row md:items-center md:gap-0">
             {/* Connecting dashed line (desktop only) */}
             <div className="hidden md:block absolute top-6 left-[calc(16.6%)] right-[calc(16.6%)] h-[2px] border-t-[2px] border-dashed border-black z-0" />
 

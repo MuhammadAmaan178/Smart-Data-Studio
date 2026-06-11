@@ -395,10 +395,10 @@ const MLStudio = ({ anomalyReport, config = {}, setConfig }) => {
         }
       `}</style>
 
-      <div className="flex flex-col md:flex-row flex-1 w-full min-h-0 overflow-y-auto md:overflow-hidden bg-[#fef9ef]">
+      <div className="flex flex-col lg:flex-row flex-1 w-full min-h-0 overflow-y-auto lg:overflow-hidden bg-[#fef9ef]">
 
       {/* ── LEFT COLUMN: MODEL CONFIGURATION ── */}
-      <aside className="w-full md:w-[340px] md:min-w-[340px] shrink-0 border-b-2 md:border-b-0 md:border-r-2 border-black bg-white flex flex-col overflow-y-auto select-none">
+      <aside className="w-full lg:w-1/3 lg:min-w-[340px] shrink-0 border-b-2 lg:border-b-0 lg:border-r-2 border-black bg-white flex flex-col overflow-y-auto select-none">
         
         {/* Sidebar Header */}
         <div className="p-4 bg-black text-white flex items-center gap-3 shrink-0">
@@ -745,7 +745,7 @@ const MLStudio = ({ anomalyReport, config = {}, setConfig }) => {
       </aside>
 
       {/* ── RIGHT COLUMN: RESULTS CANVAS ── */}
-      <main className="flex-1 min-w-0 p-4 md:p-6 overflow-y-auto bg-[#fef9ef]">
+      <main className="w-full lg:w-2/3 flex-1 min-w-0 p-4 md:p-6 overflow-y-auto bg-[#fef9ef]">
         
         {/* Error bar */}
         {error && (

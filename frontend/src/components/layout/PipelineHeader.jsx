@@ -28,15 +28,15 @@ const PipelineHeader = ({ currentView }) => {
 
   return (
     <div 
-      className="flex flex-col shrink-0 w-full bg-[#fef9ef] border-b-[2px] border-black z-50"
-      style={{ padding: '8px 24px', height: '48px', justifyContent: 'center' }}
+      className="flex flex-col shrink-0 w-full bg-[#fef9ef] border-b-[2px] border-black z-30"
+      style={{ padding: '8px 16px', minHeight: '48px', height: 'auto', justifyContent: 'center' }}
     >
       <div className="flex items-center justify-between h-full">
-        <div className="flex items-center gap-2 text-xl font-black uppercase text-black">
+        <div className="flex items-center gap-2 text-base md:text-xl font-black uppercase text-black">
           {currentInfo.icon}
           {currentInfo.title}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2">
           {steps.map((step, i) => {
             const isActive = i === activeIndex;
             return (
