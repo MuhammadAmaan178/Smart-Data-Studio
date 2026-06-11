@@ -2,6 +2,11 @@ import numpy as np
 import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from dotenv import load_dotenv
+import os
+
+load_dotenv(override=True)
+
 from services.data_processor import global_store
 from api.upload import upload_bp
 from api.clean import clean_bp
@@ -14,11 +19,46 @@ from api.demo import demo_bp
 from api.predict import predict_bp
 from api.features import features_bp
 from api.dashboard import dashboard_bp
+from api.auth import auth_bp
+from api.projects import projects_bp
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {
+    "origins": ["http://localhost:5173"],
+    "allow_headers": ["Content-Type", "Authorization"],
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "supports_credentials": True
+}})
+
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        from flask import Response
+        res = Response()
+        res.headers['Access-Control-Allow-Origin'] = 'http://localhost:5173'
+        res.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        res.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        res.headers['Access-Control-Allow-Credentials'] = 'true'
+        return res, 200
+
+@app.route('/api/cors-test', methods=['GET', 'OPTIONS'])
+def cors_test():
+    return jsonify({'cors': 'working'}), 200
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    from werkzeug.exceptions import HTTPException
+    if isinstance(e, HTTPException):
+        return e
+    
+    response = jsonify({"error": str(e)})
+    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:5173'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    return response, 500
 
 # Register Blueprints
+app.register_blueprint(auth_bp, url_prefix='/api/auth')
+app.register_blueprint(projects_bp, url_prefix='/api/projects')
 app.register_blueprint(upload_bp,  url_prefix='/api')
 app.register_blueprint(clean_bp,   url_prefix='/api')
 app.register_blueprint(metrics_bp, url_prefix='/api')

@@ -31,7 +31,10 @@ def upload_file():
 def export_data():
     df = global_store.get("df")
     if df is None:
-        return jsonify({"error": "No dataset loaded. Please upload data before saving workspace."}), 400
+        return jsonify({
+            "success": True,
+            "data": []
+        }), 200
     
     # Return full dataset as records for SDS serialization
     return jsonify({

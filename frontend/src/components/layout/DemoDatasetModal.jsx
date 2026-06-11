@@ -11,7 +11,7 @@ const DATASETS = [
     tagCls:  'bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300',
     emoji:   '🚢',
     desc:    'Passenger survival data. Perfect for data cleaning, EDA, and binary classification.',
-    badges:  ['Cleaning', 'Classification'],
+    badges:  ['Cleaning', 'Classification', 'Decision Tree'],
   },
   {
     name:    'breast_cancer',
@@ -29,7 +29,7 @@ const DATASETS = [
     tagCls:  'bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300',
     emoji:   '🐧',
     desc:    'Three penguin species across three islands. Great for dashboards and clustering.',
-    badges:  ['Dashboard', 'Clustering'],
+    badges:  ['Dashboard', 'K-Means'],
   },
   {
     name:    'iris',
@@ -47,7 +47,7 @@ const DATASETS = [
     tagCls:  'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300',
     emoji:   '🍷',
     desc:    '13 chemical measurements of Italian wines. Multi-class classification benchmark.',
-    badges:  ['Random Forest', 'Naive Bayes'],
+    badges:  ['KNN', 'SVM'],
   },
 ];
 

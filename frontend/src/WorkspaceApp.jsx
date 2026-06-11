@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import AppLayout from './components/layout/AppLayout';
 import DemoDatasetModal from './components/layout/DemoDatasetModal';
 import DataPrep from './components/data-prep/DataPrep';
@@ -8,11 +9,15 @@ import DLStudio from './components/dl-studio/DLStudio';
 import DataSummary from './components/summary/DataSummary';
 import FeatureEngineering from './components/feature-engineering/FeatureEngineering';
 import 'react-grid-layout/css/styles.css';
+import { getSession, logOut } from './utils/auth';
+import { saveProject } from './utils/projects';
 
 import axios from 'axios';
 
-function WorkspaceApp() {
+function WorkspaceApp({ session: propSession, onSessionChange }) {
+  const session = getSession() || propSession;
   const [currentView, setCurrentView] = useState('data-prep');
+
 
   // Reset scroll position to top when navigating to a new tab/view
   React.useEffect(() => {
@@ -58,13 +63,157 @@ function WorkspaceApp() {
     results: null
   });
 
-  // Project Info
-  const [projectName, setProjectName] = useState('Untitled_Project.sds');
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Reset backend on mount for a clean slate
-  React.useEffect(() => {
-    axios.post('http://localhost:5000/api/clear').catch(e => console.error("Reset failed", e));
-  }, []);
+  useEffect(() => {
+    if (!session) {
+      navigate('/login');
+    }
+  }, [session, navigate]);
+
+  // Cloud Save / Load States
+  const [currentProjectId, setCurrentProjectId] = useState(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [showRestoreModal, setShowRestoreModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('');
+  const [projectName, setProjectName] = useState('Untitled_Project');
+
+  // Track if initial mount has finished loading state
+  const isLoadedRef = useRef(false);
+
+  // Restore project on mount or clean slate
+  useEffect(() => {
+    const initWorkspace = async () => {
+      if (location.state?.projectConfig) {
+        const config = location.state.projectConfig;
+        setCurrentProjectId(location.state.projectId);
+        setProjectName(location.state.projectName || 'Untitled_Project');
+
+        // Restore Backend Data if present
+        if (config.rawDataset) {
+          try {
+            const restoreRes = await axios.post('http://localhost:5000/api/restore', { data: config.rawDataset });
+            setDataPreview(restoreRes.data.data_preview);
+            setAnomalyReport(restoreRes.data.anomaly_report);
+            setIsDataLoaded(true);
+          } catch (restoreErr) {
+            console.error("Backend restoration failed", restoreErr);
+            alert("Warning: Dataset could not be restored to backend. Some features may be disabled.");
+          }
+        }
+
+        // Restore UI States
+        if (config.cleaningActions) setCleaningActions(config.cleaningActions);
+        
+        if (config.dashboard) {
+          setLayout(config.dashboard.layout || []);
+          setCards(config.dashboard.cards || []);
+        }
+
+        if (config.mlConfig) setMlConfig(config.mlConfig);
+        if (config.dlConfig) setDlConfig(config.dlConfig);
+
+        setTimeout(() => {
+          isLoadedRef.current = true;
+          setHasUnsavedChanges(false);
+          setSaveStatus('');
+        }, 300);
+
+      } else {
+        // Reset backend for a clean slate
+        try {
+          await axios.post('http://localhost:5000/api/clear');
+        } catch (e) {
+          console.error("Reset failed", e);
+        }
+        isLoadedRef.current = true;
+      }
+    };
+
+    initWorkspace();
+  }, [location.state]);
+
+  // Detect changes to set unsaved changes indicator
+  useEffect(() => {
+    if (!isLoadedRef.current) return;
+    setHasUnsavedChanges(true);
+    setSaveStatus('unsaved');
+  }, [dataPreview, layout, cards, mlConfig, dlConfig, projectName]);
+
+  const saveToCloud = async (nameOverride) => {
+    const session = getSession();
+    if (!session) {
+      navigate('/login');
+      return;
+    }
+    
+    setIsSaving(true);
+    setSaveStatus('saving');
+    
+    let rawDataset = null;
+    try {
+      const res = await axios.get('http://localhost:5000/api/export');
+      rawDataset = res.data.data;
+    } catch (e) {
+      console.error("Export dataset failed", e);
+    }
+
+    const workspaceState = {
+      rawDataset,
+      isDataLoaded,
+      dataPreview,
+      anomalyReport,
+      cleaningActions,
+      dashboard: { layout, cards },
+      mlConfig,
+      dlConfig
+    };
+    
+    const finalName = nameOverride || projectName;
+    
+    try {
+      const result = await saveProject(
+        finalName,
+        workspaceState,
+        currentProjectId
+      );
+      
+      setCurrentProjectId(result.id);
+      setProjectName(result.project_name);
+      setHasUnsavedChanges(false);
+      setSaveStatus('saved');
+      setTimeout(() => {
+        setSaveStatus('');
+      }, 3000);
+    } catch (err) {
+      console.error("Save to cloud failed:", err);
+      setSaveStatus('unsaved');
+      alert(`Save to Cloud Failed: ${err.message || err}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const [modalProjectName, setModalProjectName] = useState('');
+
+  const handleSaveToCloudTrigger = () => {
+    if (currentProjectId) {
+      saveToCloud(projectName);
+    } else {
+      setModalProjectName(projectName === 'Untitled_Project' ? '' : projectName);
+      setShowNameModal(true);
+    }
+  };
+
+  const handleLogout = () => {
+    logOut();
+    if (onSessionChange) onSessionChange(null);
+    navigate('/login');
+  };
+
 
   // Called by DemoDatasetModal after a successful load
   const handleDemoLoaded = (data) => {
@@ -164,7 +313,7 @@ function WorkspaceApp() {
         if (state.mlConfig) setMlConfig(state.mlConfig);
         if (state.dlConfig) setDlConfig(state.dlConfig);
 
-        alert("Workspace fully restored!");
+        setShowRestoreModal(true);
       } catch (err) {
         console.error(err);
         alert("Failed to parse workspace file. The file may be corrupted or in an old format.");
@@ -195,6 +344,12 @@ function WorkspaceApp() {
         setProjectName={setProjectName}
         onSaveWorkspace={handleSaveWorkspace}
         onLoadWorkspace={handleLoadWorkspace}
+        hasUnsavedChanges={hasUnsavedChanges}
+        isSaving={isSaving}
+        saveStatus={saveStatus}
+        session={session}
+        onSaveToCloud={handleSaveToCloudTrigger}
+        onLogout={handleLogout}
       >
 
         {/* ── View: Data Prep ────────────────────────────────────────── */}
@@ -323,6 +478,83 @@ function WorkspaceApp() {
           onDemoLoaded={handleDemoLoaded}
         />
       )}
+
+      {/* Name Modal */}
+      {showNameModal && (
+        <div style={{ zIndex: 99999 }} className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white border-[3px] border-black w-full max-w-[400px] shadow-[6px_6px_0px_rgba(0,0,0,1)] overflow-hidden">
+            {/* Header */}
+            <div className="bg-black text-white px-4 py-3 font-black text-sm uppercase">
+              NAME YOUR PROJECT
+            </div>
+            {/* Content */}
+            <div className="p-5 space-y-4">
+              <input
+                type="text"
+                value={modalProjectName}
+                onChange={(e) => setModalProjectName(e.target.value)}
+                placeholder="My Analysis Project"
+                className="w-full p-3 border-[3px] border-black bg-[#fef9ef] font-bold text-black placeholder:text-gray-400 focus:outline-none"
+              />
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowNameModal(false)}
+                  className="px-4 py-2 border-[3px] border-black bg-white text-black font-bold text-xs uppercase hover:bg-gray-100 cursor-pointer"
+                >
+                  CANCEL
+                </button>
+                <button
+                  onClick={() => {
+                    if (modalProjectName.trim()) {
+                      saveToCloud(modalProjectName);
+                      setShowNameModal(false);
+                    } else {
+                      alert('Please enter a project name');
+                    }
+                  }}
+                  className="px-4 py-2 border-[3px] border-black bg-[#ffe45e] text-black font-black text-xs uppercase shadow-[3px_3px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
+                >
+                  SAVE TO CLOUD
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Neo-Brutalist Workspace Restored Modal */}
+      {showRestoreModal && (
+        <div style={{ zIndex: 99999 }} className="fixed inset-0 bg-black/40 flex items-center justify-center p-4">
+          <div className="bg-[#ffe45e] border-[3px] border-black w-full max-w-[420px] shadow-[8px_8px_0px_rgba(0,0,0,1)] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            {/* Header */}
+            <div className="bg-black text-white px-5 py-4 font-black text-sm uppercase tracking-wider border-b-[3px] border-black">
+              SYSTEM NOTIFICATION
+            </div>
+            {/* Content */}
+            <div className="p-6 space-y-5">
+              <div className="space-y-1">
+                <h3 className="font-black text-black text-xl uppercase tracking-wide">WORKSPACE RESTORED</h3>
+                <p className="font-bold text-black text-xs">Your analysis environment is fully loaded.</p>
+              </div>
+
+              {/* Monospace Code Widget */}
+              <div className="bg-[#fef9ef] border-[2px] border-black p-4 font-mono text-xs text-black space-y-1.5 shadow-inner">
+                <div>&gt;_ STATUS: 200_OK</div>
+                <div>&gt;_ PIPELINE: RESTORED</div>
+              </div>
+
+              {/* Action Button */}
+              <button
+                onClick={() => setShowRestoreModal(false)}
+                className="w-full py-3 border-[3px] border-black bg-white text-black font-black text-sm uppercase tracking-wider shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+              >
+                ENTER WORKSPACE
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

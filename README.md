@@ -45,7 +45,4 @@
    ```
 
 ## 📄 License
-This project is part of the "Programming for AI" lab series. All rights reserved.
-
----
-**Developed by Amaan**
+This project is licensed under the MIT License.

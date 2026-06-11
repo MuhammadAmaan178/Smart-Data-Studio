@@ -1,30 +1,32 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { logIn } from '../utils/auth';
 
-const LoginPage = () => {
+const LoginPage = ({ onSessionChange }) => {
   const navigate = useNavigate();
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [loading,  setLoading]  = useState(false);
+  const [error,    setError]    = useState('');
 
-  const handleLogin = () => {
-    if (!email || !password) return;
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
     setLoading(true);
-    // Simulate auth — navigate to workspace
-    setTimeout(() => {
-      setLoading(false);
-      navigate('/app');
-    }, 800);
-  };
-
-  const handleGoogle = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigate('/app');
-    }, 800);
+    setError('');
+    try {
+      const session = await logIn(email, password);
+      // Update parent session state
+      onSessionChange(session);
+      navigate('/projects');
+    } catch (err) {
+      setError(err.message);
+    }
+    setLoading(false);
   };
 
   return (
@@ -132,33 +134,7 @@ const LoginPage = () => {
                          transition-all duration-75 cursor-pointer
                          disabled:opacity-50 disabled:cursor-not-allowed disabled:active:translate-x-0 disabled:active:translate-y-0 disabled:active:shadow-[4px_4px_0px_#000]"
             >
-              {loading ? 'Signing In...' : 'Log In'}
-            </button>
-
-            {/* Divider */}
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-[2px] bg-black" />
-              <span className="text-xs font-black uppercase text-gray-500 px-1">or</span>
-              <div className="flex-1 h-[2px] bg-black" />
-            </div>
-
-            {/* Google Button */}
-            <button
-              onClick={handleGoogle}
-              disabled={loading}
-              className="w-full py-3 font-black uppercase text-black text-sm tracking-wider
-                         bg-white border-[3px] border-black
-                         shadow-[4px_4px_0px_#000] hover:shadow-[2px_2px_0px_#000] hover:bg-gray-50
-                         active:translate-x-1 active:translate-y-1 active:shadow-none
-                         transition-all duration-75 cursor-pointer
-                         flex items-center justify-center gap-3
-                         disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {/* Google "G" wordmark as styled text */}
-              <span className="w-5 h-5 border-[2px] border-black flex items-center justify-center text-xs font-black bg-white">
-                G
-              </span>
-              Continue with Google
+              {loading ? 'SIGNING IN...' : 'Log In'}
             </button>
 
             {/* Sign Up Link */}
@@ -171,6 +147,22 @@ const LoginPage = () => {
                 Sign Up
               </button>
             </p>
+
+            {/* Error Message */}
+            <div id="auth-error-message" style={{
+              background: '#ff499e',
+              border: '2px solid black',
+              boxShadow: '4px 4px 0px #000',
+              padding: '12px 16px',
+              fontWeight: 'bold',
+              color: 'white',
+              fontSize: '13px',
+              marginTop: '12px',
+              display: error ? 'block' : 'none'
+            }}>
+              ⚠ {error}
+            </div>
+
           </div>
         </div>
       </div>

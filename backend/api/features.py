@@ -28,8 +28,12 @@ def safe_cast(val):
 
 @features_bp.route('/info', methods=['POST'])
 def features_info():
-    df, err, status = check_df()
-    if err: return err, status
+    df = global_store.get('df')
+    if df is None:
+        return jsonify({
+            "columns": [],
+            "preview": []
+        }), 200
     
     columns_info = [{"name": col, "dtype": str(df[col].dtype)} for col in df.columns]
     
@@ -370,8 +374,9 @@ def string_ops():
 
 @features_bp.route('/preview', methods=['POST', 'GET'])
 def preview():
-    df, err, status = check_df()
-    if err: return err, status
+    df = global_store.get('df')
+    if df is None:
+        return jsonify([]), 200
     
     preview_df = df.head(5).replace({np.nan: None})
     preview_records = []

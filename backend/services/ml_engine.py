@@ -11,18 +11,14 @@ from sklearn.metrics import (
 # Classification Algorithms
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
-from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import GaussianNB
 
 # Regression Algorithms
-from sklearn.linear_model import LinearRegression, Ridge, Lasso
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 
 # Clustering Algorithms
-from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
+from sklearn.cluster import KMeans
 
 from services.model_store import latest_model_store, clear_store
 from services.data_processor import global_store
@@ -133,21 +129,10 @@ def _run_classification(X, df_clean, target_col, algorithm, params, test_size_va
         min_split = int(params.get("min_samples_split", 2))
         crit = params.get("criterion", "gini")
         model = DecisionTreeClassifier(max_depth=max_depth, min_samples_split=min_split, criterion=crit, random_state=42)
-    elif algorithm == "random_forest":
-        n_estimators = int(params.get("n_estimators", 100))
-        max_depth = params.get("max_depth")
-        max_depth = int(max_depth) if max_depth and str(max_depth).strip() != "" else None
-        model = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth, random_state=42)
     elif algorithm == "svm":
         C = float(params.get("C", 1.0))
         kernel = params.get("kernel", "rbf")
         model = SVC(C=C, kernel=kernel, probability=True, random_state=42)
-    elif algorithm == "logistic_regression":
-        C = float(params.get("C", 1.0))
-        max_iter = int(params.get("max_iterations", params.get("max_iter", 100)))
-        model = LogisticRegression(C=C, max_iter=max_iter, random_state=42)
-    elif algorithm == "naive_bayes":
-        model = GaussianNB()
     else:
         raise ValueError(f"Unknown classification algorithm: {algorithm}")
 
@@ -209,18 +194,6 @@ def _run_regression(X, df_clean, target_col, algorithm, params, test_size_val):
     if algorithm == "linear_regression":
         fit_intercept = bool(params.get("fit_intercept", True))
         model = LinearRegression(fit_intercept=fit_intercept)
-    elif algorithm == "ridge_regression" or algorithm == "ridge":
-        alpha = float(params.get("alpha", 1.0))
-        model = Ridge(alpha=alpha, random_state=42)
-    elif algorithm == "lasso_regression" or algorithm == "lasso":
-        alpha = float(params.get("alpha", 1.0))
-        model = Lasso(alpha=alpha, random_state=42)
-    elif algorithm == "decision_tree_regressor" or algorithm == "decision_tree":
-        max_depth = params.get("max_depth")
-        max_depth = int(max_depth) if max_depth and str(max_depth).strip() != "" else None
-        min_split = int(params.get("min_samples_split", 2))
-        crit = params.get("criterion", "squared_error")
-        model = DecisionTreeRegressor(max_depth=max_depth, min_samples_split=min_split, criterion=crit, random_state=42)
     elif algorithm == "random_forest_regressor" or algorithm == "random_forest":
         n_estimators = int(params.get("n_estimators", 100))
         max_depth = params.get("max_depth")
@@ -262,14 +235,6 @@ def _run_clustering(X, algorithm, params):
         max_iter = int(params.get("max_iterations", params.get("max_iter", 300)))
         init_method = params.get("init", "k-means++")
         model = KMeans(n_clusters=n_clusters, max_iter=max_iter, init=init_method, random_state=42, n_init=10)
-    elif algorithm == "dbscan":
-        eps = float(params.get("eps", 0.5))
-        min_samples = int(params.get("min_samples", 5))
-        model = DBSCAN(eps=eps, min_samples=min_samples)
-    elif algorithm == "agglomerative_clustering" or algorithm == "agglomerative":
-        n_clusters = int(params.get("n_clusters", 3))
-        linkage = params.get("linkage", "ward")
-        model = AgglomerativeClustering(n_clusters=n_clusters, linkage=linkage)
     else:
         raise ValueError(f"Unknown clustering algorithm: {algorithm}")
 

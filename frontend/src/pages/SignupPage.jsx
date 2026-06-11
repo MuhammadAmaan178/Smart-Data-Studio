@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { signUp } from '../utils/auth';
 
-const SignupPage = () => {
+const SignupPage = ({ onSessionChange }) => {
   const navigate = useNavigate();
   const [fullName,   setFullName]   = useState('');
   const [email,      setEmail]      = useState('');
@@ -12,6 +13,7 @@ const SignupPage = () => {
   const [showConf,   setShowConf]   = useState(false);
   const [loading,    setLoading]    = useState(false);
   const [pwError,    setPwError]    = useState('');
+  const [error,      setError]      = useState('');
 
   const isValid = fullName && email && password && confirmPw && !pwError;
 
@@ -24,13 +26,29 @@ const SignupPage = () => {
     }
   };
 
-  const handleSignup = () => {
-    if (!isValid) return;
+  const handleSignup = async () => {
+    if (!fullName || !email || !password || !confirmPw) {
+      setError('Please fill in all fields');
+      return;
+    }
+    if (password !== confirmPw) {
+      setError('Passwords do not match');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigate('/app');
-    }, 900);
+    setError('');
+    try {
+      const session = await signUp(fullName, email, password);
+      onSessionChange(session);
+      navigate('/projects');
+    } catch (err) {
+      setError(err.message);
+    }
+    setLoading(false);
   };
 
   return (
@@ -203,7 +221,7 @@ const SignupPage = () => {
                          transition-all duration-75 cursor-pointer
                          disabled:opacity-50 disabled:cursor-not-allowed disabled:active:translate-x-0 disabled:active:translate-y-0 disabled:active:shadow-[4px_4px_0px_#000]"
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? 'CREATING ACCOUNT...' : 'Create Account'}
             </button>
 
             {/* Login Link */}
@@ -216,6 +234,14 @@ const SignupPage = () => {
                 Log In
               </button>
             </p>
+
+            {/* Error Message */}
+            {error && (
+              <div className="p-3 bg-[#ff499e] border-[3px] border-black text-white font-bold text-sm text-center uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] animate-in fade-in duration-200">
+                {error}
+              </div>
+            )}
+
           </div>
         </div>
       </div>

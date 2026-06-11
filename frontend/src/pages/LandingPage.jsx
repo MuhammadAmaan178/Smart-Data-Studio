@@ -115,8 +115,17 @@ const Step = ({ num, title, desc }) => (
 );
 
 /* ─── Main LandingPage ───────────────────────────────────── */
-const LandingPage = () => {
+const LandingPage = ({ session }) => {
   const navigate = useNavigate();
+
+  const handleGetStartedAction = () => {
+    if (session) {
+      navigate('/projects');
+    } else {
+      navigate('/signup');
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-[#fef9ef] font-sans">
@@ -135,13 +144,22 @@ const LandingPage = () => {
 
         {/* Nav Actions */}
         <div className="flex items-center gap-3">
-          <NeoBtn variant="outline" onClick={() => navigate('/login')} className="px-4 py-2 text-sm">
-            Log In
-          </NeoBtn>
-          <NeoBtn variant="yellow" onClick={() => navigate('/signup')} className="px-4 py-2 text-sm">
-            Get Started
-          </NeoBtn>
+          {session ? (
+            <NeoBtn variant="yellow" onClick={() => navigate('/projects')} className="px-4 py-2 text-sm">
+              My Projects
+            </NeoBtn>
+          ) : (
+            <>
+              <NeoBtn variant="outline" onClick={() => navigate('/login')} className="px-4 py-2 text-sm">
+                Log In
+              </NeoBtn>
+              <NeoBtn variant="yellow" onClick={handleGetStartedAction} className="px-4 py-2 text-sm">
+                Get Started
+              </NeoBtn>
+            </>
+          )}
         </div>
+
       </nav>
 
       {/* ── HERO ───────────────────────────────────────────── */}
@@ -166,7 +184,7 @@ const LandingPage = () => {
           <div className="flex flex-wrap gap-4">
             <NeoBtn
               variant="yellow"
-              onClick={() => navigate('/signup')}
+              onClick={handleGetStartedAction}
               className="text-base px-7 py-3 flex items-center gap-2"
             >
               Get Started Free <ArrowRight size={16} />
@@ -252,7 +270,7 @@ const LandingPage = () => {
           <div className="text-center mt-14">
             <NeoBtn
               variant="yellow"
-              onClick={() => navigate('/signup')}
+              onClick={handleGetStartedAction}
               className="text-base px-8 py-3"
             >
               Start Building Now

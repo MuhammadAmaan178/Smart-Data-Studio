@@ -11,7 +11,8 @@ const AppLayout = ({
   onFileUpload,
   isDataLoaded,
   projectName, setProjectName,
-  onSaveWorkspace, onLoadWorkspace
+  onSaveWorkspace, onLoadWorkspace,
+  hasUnsavedChanges, isSaving, saveStatus, session, onSaveToCloud, onLogout
 }) => {
   const isDashboard = currentView === 'dashboard';
   const isMlStudio = currentView === 'ml-studio';
@@ -37,8 +38,15 @@ const AppLayout = ({
           setProjectName={setProjectName}
           onSaveWorkspace={onSaveWorkspace}
           onLoadWorkspace={onLoadWorkspace}
+          hasUnsavedChanges={hasUnsavedChanges}
+          isSaving={isSaving}
+          saveStatus={saveStatus}
+          session={session}
+          onSaveToCloud={onSaveToCloud}
+          onLogout={onLogout}
         />
       </div>
+
 
       {/* Body row */}
       <div className="flex flex-1 min-h-0 overflow-hidden">

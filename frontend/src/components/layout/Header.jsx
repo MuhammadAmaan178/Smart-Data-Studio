@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { logOut } from '../../utils/auth';
 import {
   Database, Save, Download,
   PanelLeftClose, PanelLeftOpen, RefreshCw, Trash2,
   Wifi, ChevronDown, FolderOpen, Sparkles, FileText,
+  Cloud, LogOut,
 } from 'lucide-react';
 
 // ─── Click-outside dropdown hook ─────────────────────────────────
@@ -103,12 +106,21 @@ const ProjectName = ({ name, setName }) => {
 // ─── Main Header ──────────────────────────────────────────────────
 const Header = ({ 
   sidebarOpen, toggleSidebar, onOpenDemoModal, 
-  onFileUpload, projectName, setProjectName, onSaveWorkspace, onLoadWorkspace
+  onFileUpload, projectName, setProjectName, onSaveWorkspace, onLoadWorkspace,
+  hasUnsavedChanges, isSaving, saveStatus, session, onSaveToCloud, onLogout
 }) => {
+  const navigate = useNavigate();
+  const avatarDropdown = useDropdown();
   const fileInputRef = useRef(null);
   const sdsInputRef  = useRef(null);
 
   const fileItems = [
+    {
+      label: 'MY PROJECTS',
+      icon: FolderOpen,
+      action: () => navigate('/projects')
+    },
+    'divider',
     { 
       label: 'Import Dataset (.csv)', 
       icon: Database, 
@@ -127,7 +139,20 @@ const Header = ({
       action: onSaveWorkspace,
       shortcut: 'Ctrl+S' 
     },
+    {
+      label: 'Save to Cloud',
+      icon: Cloud,
+      action: onSaveToCloud,
+      shortcut: 'Ctrl+Shift+S'
+    },
+    'divider',
+    {
+      label: 'Log Out',
+      icon: LogOut,
+      action: onLogout
+    }
   ];
+
 
   const viewItems = [
     {
@@ -160,6 +185,28 @@ const Header = ({
           </div>
           <span className="text-black font-black text-lg select-none">/</span>
           <ProjectName name={projectName} setName={setProjectName} />
+
+          {/* Unsaved Changes Indicator */}
+          {isSaving && (
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase text-black bg-yellow-200 border-[2px] border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] ml-2">
+              <RefreshCw size={10} className="animate-spin text-black" />
+              <span>SAVING...</span>
+            </div>
+          )}
+
+          {!isSaving && saveStatus === 'saved' && (
+            <div className="flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-black uppercase text-white bg-lime-500 border-[2px] border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] ml-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="mr-0.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>SAVED</span>
+            </div>
+          )}
+
+          {!isSaving && saveStatus !== 'saved' && hasUnsavedChanges && (
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase text-black bg-amber-100 border-[2px] border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] ml-2 animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-amber-400 border border-black inline-block" />
+              <span>UNSAVED</span>
+            </div>
+          )}
         </div>
 
         {/* Right: Connection + Theme toggle + Avatar */}
@@ -173,12 +220,66 @@ const Header = ({
             <span>Connected</span>
           </div>
 
-          {/* User Avatar */}
-          <div className="w-8 h-8 border-[3px] border-black flex items-center justify-center
-                          text-black text-xs font-black cursor-pointer
-                          bg-pink-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
-                          hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-none">
-            A
+          {/* User Avatar Dropdown */}
+          <div className="relative" ref={avatarDropdown.ref}>
+            <button
+              onClick={() => avatarDropdown.setIsOpen(o => !o)}
+              className={`h-8 flex items-center justify-center gap-1.5 px-2.5 border-[3px] border-black
+                         text-black text-xs font-black cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                         transition-none select-none ${
+                           avatarDropdown.isOpen 
+                             ? 'bg-[#ffe45e]' 
+                             : 'bg-pink-400 hover:bg-[#ffe45e]'
+                         }`}
+            >
+              <span>{session?.email ? session.email.charAt(0).toUpperCase() : 'A'}</span>
+              <ChevronDown size={11} className={`transition-transform duration-200 ${avatarDropdown.isOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {avatarDropdown.isOpen && (
+              <div
+                style={{ zIndex: 99999 }}
+                className="absolute right-0 top-full mt-2 w-56 bg-white border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col"
+              >
+                {/* User info row (not clickable) */}
+                <div className="px-3.5 py-2.5 text-left select-none">
+                  <div className="text-xs font-bold text-black truncate">{session?.email}</div>
+                  <div className="text-[9px] font-bold text-gray-500 tracking-wider mt-0.5">SMART DATASTUDIO</div>
+                </div>
+
+                {/* Divider */}
+                <div className="border-t-2 border-black" />
+
+                {/* MY PROJECTS */}
+                <button
+                  onClick={() => {
+                    avatarDropdown.setIsOpen(false);
+                    navigate('/projects');
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs text-left font-bold text-black hover:bg-cyan-300 transition-none cursor-pointer uppercase"
+                >
+                  <FolderOpen size={13} className="text-black shrink-0" />
+                  <span className="flex-1">MY PROJECTS</span>
+                </button>
+
+                {/* LOG OUT */}
+                <button
+                  onClick={() => {
+                    avatarDropdown.setIsOpen(false);
+                    if (onLogout) {
+                      onLogout();
+                    } else {
+                      logOut();
+                      navigate('/login');
+                    }
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs text-left font-bold text-black hover:bg-cyan-300 transition-none cursor-pointer uppercase"
+                >
+                  <LogOut size={13} className="text-black shrink-0" />
+                  <span className="flex-1">LOG OUT</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

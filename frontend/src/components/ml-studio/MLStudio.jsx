@@ -352,19 +352,13 @@ const MLStudio = ({ anomalyReport, config = {}, setConfig }) => {
         <>
           <option value="knn">K-NEAREST NEIGHBORS (KNN)</option>
           <option value="decision_tree">DECISION TREE</option>
-          <option value="random_forest">RANDOM FOREST</option>
           <option value="svm">SUPPORT VECTOR MACHINE (SVM)</option>
-          <option value="logistic_regression">LOGISTIC REGRESSION</option>
-          <option value="naive_bayes">NAIVE BAYES</option>
         </>
       );
     } else if (task === 'regression') {
       return (
         <>
           <option value="linear_regression">LINEAR REGRESSION</option>
-          <option value="ridge_regression">RIDGE REGRESSION</option>
-          <option value="lasso_regression">LASSO REGRESSION</option>
-          <option value="decision_tree_regressor">DECISION TREE REGRESSOR</option>
           <option value="random_forest_regressor">RANDOM FOREST REGRESSOR</option>
         </>
       );
@@ -372,8 +366,6 @@ const MLStudio = ({ anomalyReport, config = {}, setConfig }) => {
       return (
         <>
           <option value="kmeans">K-MEANS</option>
-          <option value="dbscan">DBSCAN</option>
-          <option value="agglomerative_clustering">AGGLOMERATIVE CLUSTERING</option>
         </>
       );
     }
