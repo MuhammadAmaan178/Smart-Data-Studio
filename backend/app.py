@@ -24,6 +24,7 @@ from api.auth import auth_bp
 from api.projects import projects_bp
 
 app = Flask(__name__)
+app.url_map.strict_slashes = False
 CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
 @app.before_request
@@ -53,6 +54,11 @@ def handle_exception(e):
     response.headers['Access-Control-Allow-Origin'] = origin
     response.headers['Access-Control-Allow-Credentials'] = 'true'
     return response, 500
+
+# Configure strict_slashes = False for all blueprints to prevent Vercel trailing-slash routing issues
+for bp in [auth_bp, projects_bp, upload_bp, clean_bp, metrics_bp, charts_bp,
+           summary_bp, ml_bp, dl_bp, demo_bp, predict_bp, features_bp, dashboard_bp]:
+    bp.strict_slashes = False
 
 # Register Blueprints
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
