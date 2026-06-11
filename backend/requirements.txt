@@ -8,4 +8,5 @@ PyJWT
 python-dotenv
 requests
 scipy
-
+matplotlib
+seaborn
