@@ -5,7 +5,7 @@ const TOKEN_KEY = 'sds_token';
 
 // SIGN UP
 export const signUp = async (fullName, email, password) => {
-  const res = await axios.post(`${BASE_URL}/signup`, {
+  const res = await axios.post(`${BASE_URL}/signup/`, {
     full_name: fullName,
     email,
     password
@@ -16,7 +16,7 @@ export const signUp = async (fullName, email, password) => {
 
 // LOG IN
 export const logIn = async (email, password) => {
-  const res = await axios.post(`${BASE_URL}/login`, {
+  const res = await axios.post(`${BASE_URL}/login/`, {
     email,
     password
   });
@@ -70,7 +70,7 @@ export const verifySession = async () => {
   const token = getToken();
   if (!token) return null;
   try {
-    const res = await axios.get(`${BASE_URL}/verify`, {
+    const res = await axios.get(`${BASE_URL}/verify/`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return res.data.user;

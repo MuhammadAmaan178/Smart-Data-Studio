@@ -4,14 +4,14 @@ import { getAuthHeader } from './auth';
 const BASE_URL = 'https://amaan909-smart-datastudio-backend.hf.space/api/projects';
 
 export const fetchProjects = async () => {
-  const res = await axios.get(`${BASE_URL}/list`, {
+  const res = await axios.get(`${BASE_URL}/list/`, {
     headers: getAuthHeader()
   });
   return res.data;
 };
 
 export const saveProject = async (projectName, configuration, projectId = null) => {
-  const res = await axios.post(`${BASE_URL}/save`, {
+  const res = await axios.post(`${BASE_URL}/save/`, {
     project_name: projectName,
     configuration,
     project_id: projectId
@@ -22,7 +22,7 @@ export const saveProject = async (projectName, configuration, projectId = null) 
 };
 
 export const deleteProject = async (projectId) => {
-  await axios.delete(`${BASE_URL}/delete/${projectId}`, {
+  await axios.delete(`${BASE_URL}/delete/${projectId}/`, {
     headers: getAuthHeader()
   });
 };
