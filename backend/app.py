@@ -23,19 +23,15 @@ from api.auth import auth_bp
 from api.projects import projects_bp
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {
-    "origins": ["http://localhost:5173"],
-    "allow_headers": ["Content-Type", "Authorization"],
-    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    "supports_credentials": True
-}})
+CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
 @app.before_request
 def handle_preflight():
     if request.method == "OPTIONS":
         from flask import Response
         res = Response()
-        res.headers['Access-Control-Allow-Origin'] = 'http://localhost:5173'
+        origin = request.headers.get('Origin', '*')
+        res.headers['Access-Control-Allow-Origin'] = origin
         res.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
         res.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
         res.headers['Access-Control-Allow-Credentials'] = 'true'
@@ -52,7 +48,8 @@ def handle_exception(e):
         return e
     
     response = jsonify({"error": str(e)})
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:5173'
+    origin = request.headers.get('Origin', '*')
+    response.headers['Access-Control-Allow-Origin'] = origin
     response.headers['Access-Control-Allow-Credentials'] = 'true'
     return response, 500
 
