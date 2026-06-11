@@ -7,3 +7,5 @@ bcrypt
 PyJWT
 python-dotenv
 requests
+scipy
+
