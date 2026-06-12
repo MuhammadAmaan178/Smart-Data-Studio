@@ -40,7 +40,7 @@ const DropdownMenu = ({ label, items }) => {
         <div 
           style={{ zIndex: 99999 }}
           className="absolute top-full left-0 mt-2 w-54 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
-                        border-[3px] overflow-hidden bg-white border-black"
+                        border-[3px] overflow-hidden bg-white border-black z-[60]"
         >
           {items.map((item, i) =>
             item === 'divider'
@@ -248,7 +248,7 @@ const Header = ({
             {avatarDropdown.isOpen && (
               <div
                 style={{ zIndex: 99999 }}
-                className="absolute right-0 top-full mt-2 w-56 bg-white border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col"
+                className="absolute right-0 top-full mt-2 w-56 bg-white border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col z-[60]"
               >
                 {/* User info row (not clickable) */}
                 <div className="px-3.5 py-2.5 text-left select-none">
@@ -295,7 +295,7 @@ const Header = ({
 
       {/* ── Menu Bar Wrapper (bottom row) ─────────────────────────── */}
       <div>
-        <div className="flex items-center gap-1.5 h-8 px-2 overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-none relative">
+        <div className="flex items-center gap-1.5 h-8 px-2 overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-none relative z-50">
           <DropdownMenu label="File"    items={fileItems}    />
           <DropdownMenu label="View"    items={viewItems}    />
           <DropdownMenu label="Runtime" items={runtimeItems} />
