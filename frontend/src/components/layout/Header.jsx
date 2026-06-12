@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logOut } from '../../utils/auth';
+import { createPortal } from 'react-dom';
 import {
   Database, Save, Download,
   PanelLeftClose, PanelLeftOpen, RefreshCw, Trash2,
@@ -12,21 +13,54 @@ import {
 const useDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
+  const menuRef = useRef(null);
   useEffect(() => {
     if (!isOpen) return;
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setIsOpen(false); };
+    const handler = (e) => {
+      const clickedInsideButton = ref.current && ref.current.contains(e.target);
+      const clickedInsideMenu = menuRef.current && menuRef.current.contains(e.target);
+      if (!clickedInsideButton && !clickedInsideMenu) {
+        setIsOpen(false);
+      }
+    };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [isOpen]);
-  return { isOpen, setIsOpen, ref };
+  return { isOpen, setIsOpen, ref, menuRef };
 };
 
 // ─── Reusable Dropdown Component ─────────────────────────────────
 const DropdownMenu = ({ label, items }) => {
-  const { isOpen, setIsOpen, ref } = useDropdown();
+  const { isOpen, setIsOpen, ref, menuRef } = useDropdown();
+  const buttonRef = useRef(null);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+
+  const updateCoords = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.bottom,
+        left: rect.left,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      updateCoords();
+      window.addEventListener('resize', updateCoords);
+      window.addEventListener('scroll', updateCoords, true);
+      return () => {
+        window.removeEventListener('resize', updateCoords);
+        window.removeEventListener('scroll', updateCoords, true);
+      };
+    }
+  }, [isOpen]);
+
   return (
     <div ref={ref} className="relative">
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(o => !o)}
         className="flex items-center gap-1 px-3 py-1 text-xs font-black cursor-pointer
                    text-black bg-white border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
@@ -36,11 +70,17 @@ const DropdownMenu = ({ label, items }) => {
         <ChevronDown size={11} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
-      {isOpen && (
+      {isOpen && createPortal(
         <div 
-          style={{ zIndex: 99999 }}
-          className="absolute top-full left-0 mt-2 w-54 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
-                        border-[3px] overflow-hidden bg-white border-black z-[60]"
+          ref={menuRef}
+          style={{
+            position: 'fixed',
+            top: `${coords.top + 2}px`,
+            left: `${coords.left}px`,
+            zIndex: 99999,
+          }}
+          className="min-w-[220px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                     border-[3px] overflow-hidden bg-white border-black"
         >
           {items.map((item, i) =>
             item === 'divider'
@@ -65,7 +105,8 @@ const DropdownMenu = ({ label, items }) => {
                 </button>
               )
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
